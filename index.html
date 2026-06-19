@@ -77,18 +77,15 @@ body{background:var(--bg-base);color:var(--text-1);font-family:-apple-system,Bli
 .chip.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent);font-weight:600}
 
 /* TASK CARD */
-.task-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:12px 14px;margin-bottom:6px;transition:all .15s;cursor:pointer;position:relative;overflow:hidden;display:flex;align-items:flex-start;gap:10px}
-.task-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:3px 0 0 3px}
-.task-card.pri-high::before{background:var(--danger)}
-.task-card.pri-medium::before{background:var(--warn)}
-.task-card.pri-low::before{background:var(--success)}
-.task-card:active{background:var(--bg-hover);transform:scale(.99)}
+.task-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:12px 14px;margin-bottom:6px;transition:all .15s;position:relative;overflow:hidden;display:flex;align-items:flex-start;gap:10px}
 .task-card.done{opacity:.5}
 
-.task-check{width:20px;height:20px;flex-shrink:0;border:2px solid var(--border-2);border-radius:50%;display:flex;align-items:center;justify-content:center;margin-top:2px;transition:all .2s;cursor:pointer}
+.task-check{width:22px;height:22px;flex-shrink:0;border:2px solid var(--border-2);border-radius:50%;display:flex;align-items:center;justify-content:center;margin-top:2px;transition:all .2s;cursor:pointer;background:none;padding:0}
 .task-check.checked{background:var(--accent);border-color:var(--accent)}
-.task-check.checked::after{content:'✓';color:#fff;font-size:11px;font-weight:700}
-.task-body{flex:1;min-width:0}
+.task-check.checked::after{content:'✓';color:#fff;font-size:12px;font-weight:700}
+.task-body{flex:1;min-width:0;cursor:pointer}
+.task-more-btn{background:none;border:none;color:var(--text-3);font-size:18px;cursor:pointer;padding:2px 8px;flex-shrink:0;border-radius:6px;transition:all .15s;line-height:1;margin-top:-2px}
+.task-more-btn:active{background:var(--bg-hover);color:var(--text-1)}
 .task-title{font-size:14px;font-weight:500;color:var(--text-1);line-height:1.4;word-break:break-word}
 .task-title.done{text-decoration:line-through;color:var(--text-3)}
 .task-desc{font-size:12px;color:var(--text-2);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -189,11 +186,6 @@ body{background:var(--bg-base);color:var(--text-1);font-family:-apple-system,Bli
 .field input:focus,.field textarea:focus,.field select:focus{border-color:var(--accent)}
 .field textarea{resize:none;min-height:80px}
 .field select option{background:var(--bg-input)}
-.pri-row{display:flex;gap:8px}
-.pri-btn{flex:1;padding:9px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg-input);color:var(--text-2);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;text-align:center}
-.pri-btn.sel-high{background:var(--danger-dim);border-color:var(--danger);color:var(--danger)}
-.pri-btn.sel-medium{background:var(--warn-dim);border-color:var(--warn);color:var(--warn)}
-.pri-btn.sel-low{background:var(--success-dim);border-color:var(--success);color:var(--success)}
 .subtask-input-row{display:flex;gap:8px;margin-bottom:8px}
 .subtask-input-row input{flex:1}
 .add-sub-btn{background:var(--accent-dim);border:1px solid var(--accent);color:var(--accent);border-radius:var(--radius-sm);padding:0 14px;font-size:20px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center}
@@ -276,9 +268,6 @@ body{background:var(--bg-base);color:var(--text-1);font-family:-apple-system,Bli
       <div class="chip active" onclick="setFilter('all',this)">Todas</div>
       <div class="chip" onclick="setFilter('pending',this)">Pendientes</div>
       <div class="chip" onclick="setFilter('done',this)">Completadas</div>
-      <div class="chip" onclick="setFilter('high',this)">🔴 Alta</div>
-      <div class="chip" onclick="setFilter('medium',this)">🟡 Media</div>
-      <div class="chip" onclick="setFilter('low',this)">🟢 Baja</div>
     </div>
     <div id="tasks-sections-list"></div>
   </div>
@@ -366,14 +355,6 @@ body{background:var(--bg-base);color:var(--text-1);font-family:-apple-system,Bli
         </div>
       </div>
       <div class="field"><label>Fecha límite</label><input type="datetime-local" id="f-due"></div>
-      <div class="field">
-        <label>Prioridad</label>
-        <div class="pri-row">
-          <div class="pri-btn" id="pb-high" onclick="setPri('high')">🔴 Alta</div>
-          <div class="pri-btn" id="pb-medium" onclick="setPri('medium')">🟡 Media</div>
-          <div class="pri-btn" id="pb-low" onclick="setPri('low')">🟢 Baja</div>
-        </div>
-      </div>
       <div class="field">
         <label>Subtareas</label>
         <div class="subtask-input-row">
@@ -464,11 +445,11 @@ if (!tasks.length) {
   const due1 = new Date(); due1.setDate(due1.getDate()+1); due1.setHours(18,0,0,0);
   const due2 = new Date(); due2.setHours(23,59,0,0);
   tasks = [
-    {id:'t1',title:'Revisar informe mensual',desc:'Verificar números del Q2',project:'p1',sectionId:'sec_p1_1',due:due1.toISOString(),priority:'high',done:false,subtasks:[{id:'s1',title:'Leer borrador',done:true},{id:'s2',title:'Agregar gráficas',done:false}],created:Date.now()-86400000},
-    {id:'t2',title:'Preparar presentación',desc:'Slides para el cliente',project:'p1',sectionId:'sec_p1_2',due:due2.toISOString(),priority:'medium',done:false,subtasks:[],created:Date.now()-3600000},
-    {id:'t3',title:'Llamar al médico',desc:'Agendar cita',project:'p2',sectionId:'sec_p2_1',due:due2.toISOString(),priority:'medium',done:false,subtasks:[],created:Date.now()-7200000},
-    {id:'t4',title:'Hacer ejercicio',desc:'',project:'',sectionId:MY_TASKS_DEFAULT_SECTION,due:'',priority:'low',done:false,subtasks:[],created:Date.now()-1800000},
-    {id:'t5',title:'Comprar víveres',desc:'',project:'',sectionId:MY_TASKS_DEFAULT_SECTION,due:'',priority:'low',done:true,subtasks:[],created:Date.now()-900000},
+    {id:'t1',title:'Revisar informe mensual',desc:'Verificar números del Q2',project:'p1',sectionId:'sec_p1_1',due:due1.toISOString(),done:false,subtasks:[{id:'s1',title:'Leer borrador',done:true},{id:'s2',title:'Agregar gráficas',done:false}],created:Date.now()-86400000},
+    {id:'t2',title:'Preparar presentación',desc:'Slides para el cliente',project:'p1',sectionId:'sec_p1_2',due:due2.toISOString(),done:false,subtasks:[],created:Date.now()-3600000},
+    {id:'t3',title:'Llamar al médico',desc:'Agendar cita',project:'p2',sectionId:'sec_p2_1',due:due2.toISOString(),done:false,subtasks:[],created:Date.now()-7200000},
+    {id:'t4',title:'Hacer ejercicio',desc:'',project:'',sectionId:MY_TASKS_DEFAULT_SECTION,due:'',done:false,subtasks:[],created:Date.now()-1800000},
+    {id:'t5',title:'Comprar víveres',desc:'',project:'',sectionId:MY_TASKS_DEFAULT_SECTION,due:'',done:true,subtasks:[],created:Date.now()-900000},
   ];
   save();
 }
@@ -479,7 +460,6 @@ if (!tasks.length) {
 let currentTab       = 'tasks';
 let activeFilter     = 'all';
 let editingTaskId    = null;
-let editingPri       = 'medium';
 let formSubtasks     = [];
 let selectedEmoji    = '📋';
 let selectedColor    = '#6c63ff';
@@ -547,9 +527,6 @@ function applyFilter(list) {
     if(q&&!t.title.toLowerCase().includes(q)&&!(t.desc||'').toLowerCase().includes(q)) return false;
     if(activeFilter==='pending') return !t.done;
     if(activeFilter==='done')    return  t.done;
-    if(activeFilter==='high')    return  t.priority==='high';
-    if(activeFilter==='medium')  return  t.priority==='medium';
-    if(activeFilter==='low')     return  t.priority==='low';
     return true;
   });
 }
@@ -662,6 +639,7 @@ function openProjectDetail(projId) {
 function closeProjectDetail() {
   document.getElementById('proj-detail-page').classList.remove('open');
   document.getElementById('proj-fab').style.display='none';
+  currentProjectId = null;
   render();
 }
 
@@ -715,10 +693,15 @@ function renderProjBoard() {
         <span class="board-col-count">${col.tasks.length}</span>
       </div>
       ${col.tasks.map(t=>`
-        <div class="board-task ${t.done?'done':''}" onclick="openDetail('${t.id}')">
-          <div class="board-task-title">${esc(t.title)}</div>
-          ${t.due?`<div style="font-size:11px;color:var(--text-3);margin-top:5px">📅 ${formatDate(new Date(t.due))}</div>`:''}
-          ${t.subtasks.length?`<div style="font-size:11px;color:var(--text-3);margin-top:4px">${t.subtasks.filter(s=>s.done).length}/${t.subtasks.length} subtareas</div>`:''}
+        <div class="board-task ${t.done?'done':''}">
+          <div style="display:flex;align-items:flex-start;gap:8px">
+            <button type="button" class="task-check ${t.done?'checked':''}" style="width:18px;height:18px;margin-top:1px" onclick="toggleDone('${t.id}')"></button>
+            <div style="flex:1;cursor:pointer" onclick="openDetail('${t.id}')">
+              <div class="board-task-title">${esc(t.title)}</div>
+              ${t.due?`<div style="font-size:11px;color:var(--text-3);margin-top:5px">📅 ${formatDate(new Date(t.due))}</div>`:''}
+              ${t.subtasks.length?`<div style="font-size:11px;color:var(--text-3);margin-top:4px">${t.subtasks.filter(s=>s.done).length}/${t.subtasks.length} subtareas</div>`:''}
+            </div>
+          </div>
         </div>`).join('')}
       <div class="add-task-inline" style="margin-top:4px;font-size:12px" onclick="openNewTask('${projId}','${col.id}')">＋</div>
     </div>`).join('');
@@ -732,7 +715,7 @@ function renderProjOverview() {
   const proj   = projects.find(p=>p.id===projId);
   const allTasks = tasks.filter(t=>t.project===projId);
   const done  = allTasks.filter(t=>t.done).length;
-  const high  = allTasks.filter(t=>!t.done&&t.priority==='high').length;
+  const pending = allTasks.length - done;
   const overdue = allTasks.filter(t=>!t.done&&t.due&&new Date(t.due)<new Date()).length;
   const pct   = allTasks.length?Math.round(done/allTasks.length*100):0;
 
@@ -746,8 +729,8 @@ function renderProjOverview() {
     <div class="overview-grid">
       <div class="ov-card"><div class="ov-num" style="color:var(--accent)">${allTasks.length}</div><div class="ov-lbl">Tareas totales</div></div>
       <div class="ov-card"><div class="ov-num" style="color:var(--success)">${done}</div><div class="ov-lbl">Completadas</div></div>
-      <div class="ov-card"><div class="ov-num" style="color:var(--danger)">${high}</div><div class="ov-lbl">Prioridad alta</div></div>
-      <div class="ov-card"><div class="ov-num" style="color:var(--warn)">${overdue}</div><div class="ov-lbl">Vencidas</div></div>
+      <div class="ov-card"><div class="ov-num" style="color:var(--warn)">${pending}</div><div class="ov-lbl">Pendientes</div></div>
+      <div class="ov-card"><div class="ov-num" style="color:var(--danger)">${overdue}</div><div class="ov-lbl">Vencidas</div></div>
     </div>
     <div style="font-size:11px;font-weight:700;letter-spacing:1px;color:var(--text-3);text-transform:uppercase;margin-bottom:10px">Por sección</div>
     ${secStats.map(s=>`
@@ -777,9 +760,9 @@ function taskCardHTML(t) {
   const dueStr = t.due ? formatDate(new Date(t.due)) : '';
   const dc     = t.subtasks.filter(s=>s.done).length;
   const pct    = t.subtasks.length ? Math.round(dc/t.subtasks.length*100) : 0;
-  return `<div class="task-card pri-${t.priority} ${t.done?'done':''}" onclick="openDetail('${t.id}')">
-    <div class="task-check ${t.done?'checked':''}" onclick="event.stopPropagation();toggleDone('${t.id}')"></div>
-    <div class="task-body">
+  return `<div class="task-card ${t.done?'done':''}">
+    <button type="button" class="task-check ${t.done?'checked':''}" onclick="toggleDone('${t.id}')"></button>
+    <div class="task-body" onclick="openDetail('${t.id}')">
       <div class="task-title ${t.done?'done':''}">${esc(t.title)}</div>
       ${t.desc?`<div class="task-desc">${esc(t.desc)}</div>`:''}
       <div class="task-meta">
@@ -789,6 +772,7 @@ function taskCardHTML(t) {
       </div>
       ${t.subtasks.length?`<div class="subtask-bar"><div class="subtask-fill" style="width:${pct}%"></div></div>`:''}
     </div>
+    <button type="button" class="task-more-btn" onclick="openDetail('${t.id}')" aria-label="Ver detalles">⋮</button>
   </div>`;
 }
 
@@ -849,7 +833,6 @@ function openDetail(id) {
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
         ${proj?`<div style="background:var(--bg-card);padding:10px;border-radius:var(--radius-sm)"><div style="font-size:11px;color:var(--text-3);margin-bottom:3px">PROYECTO</div><div style="font-size:13px;color:${proj.color}">${proj.icon} ${esc(proj.name)}</div></div>`:''}
         ${sec?`<div style="background:var(--bg-card);padding:10px;border-radius:var(--radius-sm)"><div style="font-size:11px;color:var(--text-3);margin-bottom:3px">SECCIÓN</div><div style="font-size:13px">${esc(sec.name)}</div></div>`:''}
-        <div style="background:var(--bg-card);padding:10px;border-radius:var(--radius-sm)"><div style="font-size:11px;color:var(--text-3);margin-bottom:3px">PRIORIDAD</div><div style="font-size:13px">${priIcon(t.priority)} ${priLabel(t.priority)}</div></div>
         <div style="background:var(--bg-card);padding:10px;border-radius:var(--radius-sm)"><div style="font-size:11px;color:var(--text-3);margin-bottom:3px">FECHA LÍMITE</div><div style="font-size:13px;color:${isDue&&!t.done?'var(--danger)':'var(--text-1)'}">${t.due?formatDateTime(new Date(t.due)):'Sin fecha'}</div></div>
       </div>
     </div>
@@ -867,8 +850,7 @@ function openDetail(id) {
 
 function closeDetail() {
   document.getElementById('detail-page').classList.remove('open');
-  // If opened from project, re-render project view
-  if(currentProjectId) renderProjectView(currentProjView);
+  if(document.getElementById('proj-detail-page').classList.contains('open')) renderProjectView(currentProjView);
   else render();
 }
 
@@ -880,14 +862,13 @@ function editCurrentTask() {
    TASK CRUD
 ═══════════════════════════════════════ */
 function openNewTask(projId, sectionId) {
-  editingTaskId=null; editingPri='medium'; formSubtasks=[];
+  editingTaskId=null; formSubtasks=[];
   document.getElementById('sheet-title').textContent='Nueva tarea';
   document.getElementById('f-title').value='';
   document.getElementById('f-desc').value='';
   document.getElementById('f-due').value='';
   document.getElementById('delete-btn').style.display='none';
   document.getElementById('subtask-list').innerHTML='';
-  setPri('medium');
   populateProjectSelect(projId||'');
   populateSectionSelect(projId||'', sectionId||'');
   openSheet('task-overlay');
@@ -896,7 +877,7 @@ function openNewTask(projId, sectionId) {
 
 function openEditTask(id) {
   const t=tasks.find(x=>x.id===id); if(!t) return;
-  editingTaskId=id; editingPri=t.priority; formSubtasks=t.subtasks.map(s=>({...s}));
+  editingTaskId=id; formSubtasks=t.subtasks.map(s=>({...s}));
   document.getElementById('sheet-title').textContent='Editar tarea';
   document.getElementById('f-title').value=t.title;
   document.getElementById('f-desc').value=t.desc||'';
@@ -904,7 +885,6 @@ function openEditTask(id) {
   document.getElementById('delete-btn').style.display='block';
   populateProjectSelect(t.project||'');
   populateSectionSelect(t.project||'', t.sectionId||'');
-  setPri(t.priority);
   renderFormSubtasks();
   openSheet('task-overlay');
 }
@@ -921,7 +901,6 @@ function saveTask() {
     title,desc:document.getElementById('f-desc').value.trim(),
     project:projId, sectionId:secId,
     due:dueVal?new Date(dueVal).toISOString():'',
-    priority:editingPri,
     done:editingTaskId?tasks.find(t=>t.id===editingTaskId)?.done||false:false,
     subtasks:formSubtasks,
     created:editingTaskId?tasks.find(t=>t.id===editingTaskId)?.created||Date.now():Date.now(),
@@ -944,7 +923,8 @@ function toggleDone(id) {
   tasks=tasks.map(t=>t.id===id?{...t,done:!t.done}:t); save();
   const t=tasks.find(x=>x.id===id);
   if(t?.done) showToast('✅ ¡Completada!');
-  if(currentProjectId) renderProjectView(currentProjView); else render();
+  if(document.getElementById('proj-detail-page').classList.contains('open')) renderProjectView(currentProjView);
+  else render();
 }
 
 function toggleSubtask(taskId,subId) {
@@ -1065,9 +1045,6 @@ function addSubtask() {
 function removeFormSubtask(id){formSubtasks=formSubtasks.filter(s=>s.id!==id);renderFormSubtasks();}
 function renderFormSubtasks(){document.getElementById('subtask-list').innerHTML=formSubtasks.map(s=>`<div class="subtask-item"><span>${esc(s.title)}</span><span class="rm" onclick="removeFormSubtask('${s.id}')">✕</span></div>`).join('');}
 
-function setPri(p){editingPri=p;['high','medium','low'].forEach(x=>{document.getElementById('pb-'+x).className='pri-btn'+(x===p?` sel-${x}`:'');});}
-function priIcon(p){return{high:'🔴',medium:'🟡',low:'🟢'}[p]||'🟡';}
-function priLabel(p){return{high:'Alta',medium:'Media',low:'Baja'}[p]||'Media';}
 
 function toggleSearch() {
   const bar=document.getElementById('search-bar');
