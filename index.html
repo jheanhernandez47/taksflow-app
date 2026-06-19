@@ -124,6 +124,18 @@ body{background:var(--bg-base);color:var(--text-1);font-family:-apple-system,Bli
 
 /* ── PROJECT DETAIL VIEW ── */
 #proj-detail-page{position:fixed;inset:0;background:var(--bg-base);z-index:150;transform:translateX(100%);transition:transform .25s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column}
+#summary-page{position:fixed;inset:0;background:var(--bg-base);z-index:150;transform:translateX(100%);transition:transform .25s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column}
+#summary-page.open{transform:translateX(0)}
+
+/* USER MENU */
+.user-avatar-btn{font-size:18px;border-radius:50%}
+.user-menu-overlay{position:fixed;inset:0;z-index:250;background:transparent;opacity:0;pointer-events:none;transition:opacity .15s}
+.user-menu-overlay.open{opacity:1;pointer-events:all}
+.user-menu{position:absolute;top:60px;right:16px;background:var(--bg-surface);border:1px solid var(--border-2);border-radius:var(--radius-md);box-shadow:0 8px 28px #00000077;min-width:200px;padding:6px;transform:translateY(-8px);opacity:0;transition:all .18s}
+.user-menu-overlay.open .user-menu{transform:translateY(0);opacity:1}
+.user-menu-item{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:var(--radius-sm);cursor:pointer;font-size:14px;color:var(--text-1);transition:background .15s}
+.user-menu-item:active{background:var(--bg-hover)}
+.umi-icon{font-size:16px;width:20px;text-align:center}
 #proj-detail-page.open{transform:translateX(0)}
 .proj-detail-header{background:var(--bg-surface);border-bottom:1px solid var(--border);padding:12px 14px;display:flex;align-items:center;gap:10px;flex-shrink:0}
 .back-btn{background:none;border:none;color:var(--accent);font-size:14px;cursor:pointer;display:flex;align-items:center;gap:4px;padding:4px}
@@ -244,16 +256,29 @@ body{background:var(--bg-base);color:var(--text-1);font-family:-apple-system,Bli
     <div class="header-sub" id="header-sub">Buenos días</div>
   </div>
   <div class="header-actions">
-    <button class="icon-btn" onclick="requestNotifPermission()" title="Notificaciones">🔔</button>
     <button class="icon-btn" onclick="toggleSearch()" title="Buscar">🔍</button>
+    <button class="icon-btn user-avatar-btn" onclick="toggleUserMenu()" title="Cuenta" id="user-avatar-btn">🙂</button>
   </div>
 </header>
+
+<!-- USER MENU DROPDOWN -->
+<div class="user-menu-overlay" id="user-menu-overlay" onclick="closeUserMenu()">
+  <div class="user-menu" onclick="event.stopPropagation()">
+    <div class="user-menu-item" onclick="openSummaryFromMenu()">
+      <span class="umi-icon">📊</span>
+      <span>Resumen</span>
+    </div>
+    <div class="user-menu-item" onclick="requestNotifPermission();closeUserMenu()">
+      <span class="umi-icon">🔔</span>
+      <span>Notificaciones</span>
+    </div>
+  </div>
+</div>
 
 <nav class="tabs">
   <div class="tab active" onclick="switchTab('tasks')" id="tab-tasks"><span class="tab-icon">☑</span>Mis tareas</div>
   <div class="tab" onclick="switchTab('projects')" id="tab-projects"><span class="tab-icon">📁</span>Proyectos</div>
   <div class="tab" onclick="switchTab('today')" id="tab-today"><span class="tab-icon">📅</span>Hoy</div>
-  <div class="tab" onclick="switchTab('stats')" id="tab-stats"><span class="tab-icon">📊</span>Resumen</div>
 </nav>
 
 <main class="content" id="main-content">
@@ -288,16 +313,22 @@ body{background:var(--bg-base);color:var(--text-1);font-family:-apple-system,Bli
     <div style="font-size:11px;font-weight:700;letter-spacing:1px;color:var(--text-3);text-transform:uppercase;margin:18px 0 8px">Próximas (7 días)</div>
     <div id="upcoming-list"></div>
   </div>
+</main>
 
-  <!-- RESUMEN -->
-  <div id="page-stats" class="page">
+<button class="fab" id="main-fab" onclick="openNewTask(null)" aria-label="Nueva tarea">＋</button>
+
+<!-- ── SUMMARY (Resumen) PAGE ───────────────── -->
+<div id="summary-page">
+  <div class="proj-detail-header">
+    <button class="back-btn" onclick="closeSummary()">← Volver</button>
+    <div class="proj-detail-title">📊 Resumen</div>
+  </div>
+  <div class="proj-detail-content">
     <div class="stats-grid" id="stats-grid"></div>
     <div style="font-size:11px;font-weight:700;letter-spacing:1px;color:var(--text-3);text-transform:uppercase;margin-bottom:10px">Por proyecto</div>
     <div id="proj-stats"></div>
   </div>
-</main>
-
-<button class="fab" id="main-fab" onclick="openNewTask(null)" aria-label="Nueva tarea">＋</button>
+</div>
 
 <!-- ── PROJECT DETAIL ───────────────────────── -->
 <div id="proj-detail-page">
@@ -499,7 +530,7 @@ function switchTab(tab) {
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById('page-'+tab).classList.add('active');
   const fab = document.getElementById('main-fab');
-  fab.style.display = tab==='stats'?'none':'flex';
+  fab.style.display = 'flex';
   fab.onclick = tab==='projects' ? openNewProject : ()=>openNewTask(null);
   render();
 }
@@ -508,7 +539,24 @@ function render() {
   if(currentTab==='tasks')    renderMyTasks();
   if(currentTab==='projects') renderProjects();
   if(currentTab==='today')    renderToday();
-  if(currentTab==='stats')    renderStats();
+}
+
+/* ═══════════════════════════════════════
+   USER MENU
+═══════════════════════════════════════ */
+function toggleUserMenu() {
+  document.getElementById('user-menu-overlay').classList.toggle('open');
+}
+function closeUserMenu() {
+  document.getElementById('user-menu-overlay').classList.remove('open');
+}
+function openSummaryFromMenu() {
+  closeUserMenu();
+  renderStats();
+  document.getElementById('summary-page').classList.add('open');
+}
+function closeSummary() {
+  document.getElementById('summary-page').classList.remove('open');
 }
 
 /* ═══════════════════════════════════════
@@ -695,7 +743,7 @@ function renderProjBoard() {
       ${col.tasks.map(t=>`
         <div class="board-task ${t.done?'done':''}">
           <div style="display:flex;align-items:flex-start;gap:8px">
-            <button type="button" class="task-check ${t.done?'checked':''}" style="width:18px;height:18px;margin-top:1px" onclick="toggleDone('${t.id}')"></button>
+            <div role="button" tabindex="0" class="task-check ${t.done?'checked':''}" style="width:18px;height:18px;margin-top:1px" onclick="toggleDone('${t.id}')"></div>
             <div style="flex:1;cursor:pointer" onclick="openDetail('${t.id}')">
               <div class="board-task-title">${esc(t.title)}</div>
               ${t.due?`<div style="font-size:11px;color:var(--text-3);margin-top:5px">📅 ${formatDate(new Date(t.due))}</div>`:''}
@@ -761,7 +809,7 @@ function taskCardHTML(t) {
   const dc     = t.subtasks.filter(s=>s.done).length;
   const pct    = t.subtasks.length ? Math.round(dc/t.subtasks.length*100) : 0;
   return `<div class="task-card ${t.done?'done':''}">
-    <button type="button" class="task-check ${t.done?'checked':''}" onclick="toggleDone('${t.id}')"></button>
+    <div role="button" tabindex="0" class="task-check ${t.done?'checked':''}" onclick="toggleDone('${t.id}')"></div>
     <div class="task-body" onclick="openDetail('${t.id}')">
       <div class="task-title ${t.done?'done':''}">${esc(t.title)}</div>
       ${t.desc?`<div class="task-desc">${esc(t.desc)}</div>`:''}
@@ -1083,12 +1131,24 @@ async function requestNotifPermission(){
   p==='granted'?(showToast('🔔 Notificaciones activadas'),scheduleNotifications()):showToast('🔕 Permiso denegado');
 }
 function scheduleNotifications(){
-  if(Notification.permission!=='granted') return;
+  if(!('Notification' in window) || Notification.permission!=='granted') return;
   const now=new Date();
   tasks.filter(t=>!t.done&&t.due).forEach(t=>{
     const due=new Date(t.due),diff=due-now;
     if(diff>0&&diff<=3600000) setTimeout(()=>new Notification('⏰ Tarea próxima a vencer',{body:t.title,icon:'icon-192.png',tag:t.id}),Math.max(0,diff-600000));
   });
+}
+
+/* ═══════════════════════════════════════
+   TOAST
+═══════════════════════════════════════ */
+let toastTimer;
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2500);
 }
 
 /* ═══════════════════════════════════════
