@@ -11,6 +11,7 @@
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js" defer></script>
 <style>
 :root {
   --bg-base:    #0f1117;
@@ -62,8 +63,18 @@ body{background:var(--bg-base);color:var(--text-1);font-family:-apple-system,Bli
 .content::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
 
 /* FAB */
-.fab{position:fixed;bottom:24px;right:20px;width:56px;height:56px;background:var(--accent);border-radius:50%;border:none;color:#fff;font-size:26px;cursor:pointer;box-shadow:0 4px 20px #6c63ff33,0 2px 8px #00000066;display:flex;align-items:center;justify-content:center;transition:transform .15s;z-index:100}
+.fab-wrap{position:fixed;bottom:24px;right:20px;z-index:100;display:flex;flex-direction:column;align-items:flex-end;gap:10px}
+.fab{width:56px;height:56px;background:var(--accent);border-radius:50%;border:none;color:#fff;cursor:pointer;box-shadow:0 4px 20px #6c63ff33,0 2px 8px #00000066;display:flex;align-items:center;justify-content:center;transition:transform .2s,box-shadow .2s;flex-shrink:0}
 .fab:active{transform:scale(.92)}
+.fab.menu-open{transform:rotate(45deg)}
+.fab-menu{display:flex;flex-direction:column;gap:8px;align-items:flex-end;opacity:0;pointer-events:none;transform:translateY(8px) scale(.96);transform-origin:bottom right;transition:opacity .18s,transform .18s}
+.fab-menu.open{opacity:1;pointer-events:all;transform:translateY(0) scale(1)}
+.fab-menu-item{display:flex;align-items:center;gap:10px;background:var(--bg-card);border:1px solid var(--border-2);color:var(--text-1);font-size:13px;font-weight:500;padding:10px 16px 10px 12px;border-radius:var(--radius-md);cursor:pointer;white-space:nowrap;box-shadow:0 4px 16px #00000055;transition:all .15s}
+.fab-menu-item:active{background:var(--bg-hover);transform:scale(.97)}
+.fmi-icon{width:28px;height:28px;border-radius:50%;background:var(--accent-dim);color:var(--accent);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.fmi-icon [data-lucide]{width:15px;height:15px}
+.fab-scrim{position:fixed;inset:0;z-index:99;background:#00000000;opacity:0;pointer-events:none;transition:opacity .18s}
+.fab-scrim.open{opacity:1;pointer-events:all;background:#00000044}
 
 /* SEARCH */
 .search-bar{display:flex;align-items:center;gap:8px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:0 12px;height:40px;margin-bottom:14px}
@@ -101,13 +112,13 @@ body{background:var(--bg-base);color:var(--text-1);font-family:-apple-system,Bli
 .section-group{margin-bottom:4px}
 .section-header{display:flex;align-items:center;gap:8px;padding:10px 4px 6px;cursor:pointer;user-select:none}
 .section-header:hover .section-name{color:var(--text-1)}
-.section-chevron{font-size:11px;color:var(--text-3);transition:transform .2s;flex-shrink:0}
+.section-chevron{display:flex;align-items:center;color:var(--text-3);transition:transform .2s;flex-shrink:0}
 .section-chevron.collapsed{transform:rotate(-90deg)}
 .section-name{font-size:12px;font-weight:700;letter-spacing:.8px;color:var(--text-2);text-transform:uppercase;flex:1}
 .section-count{font-size:11px;color:var(--text-3);background:var(--bg-card);border:1px solid var(--border);padding:1px 7px;border-radius:10px}
 .section-actions{display:flex;gap:4px;opacity:0;transition:opacity .15s}
 .section-header:hover .section-actions{opacity:1}
-.section-action-btn{background:none;border:none;color:var(--text-3);font-size:15px;cursor:pointer;padding:2px 4px;border-radius:4px}
+.section-action-btn{background:none;border:none;color:var(--text-3);cursor:pointer;padding:4px;border-radius:4px;display:flex;align-items:center;justify-content:center}
 .section-action-btn:hover{color:var(--text-1);background:var(--bg-hover)}
 .section-body{padding-left:0}
 .section-body.collapsed{display:none}
@@ -144,7 +155,7 @@ body{background:var(--bg-base);color:var(--text-1);font-family:-apple-system,Bli
 
 /* Project view tabs */
 .proj-view-tabs{display:flex;background:var(--bg-surface);border-bottom:1px solid var(--border);padding:0 14px;gap:0;flex-shrink:0}
-.proj-view-tab{padding:10px 14px;font-size:13px;color:var(--text-2);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap}
+.proj-view-tab{padding:10px 14px;font-size:13px;color:var(--text-2);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap;display:inline-flex;align-items:center;gap:6px}
 .proj-view-tab.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:600}
 
 .proj-detail-content{flex:1;overflow-y:auto;padding:12px 14px 80px;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
@@ -167,14 +178,18 @@ body{background:var(--bg-base);color:var(--text-1);font-family:-apple-system,Bli
 .board-cols{display:flex;gap:10px;overflow-x:auto;padding-bottom:8px;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
 .board-cols::-webkit-scrollbar{height:4px}
 .board-cols::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
-.board-col{min-width:240px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:12px;flex-shrink:0}
+.board-col{min-width:240px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:12px;flex-shrink:0;transition:background .15s,border-color .15s}
+.board-col.drag-over{background:var(--accent-dim);border-color:var(--accent)}
 .board-col-header{display:flex;align-items:center;gap:8px;margin-bottom:10px}
 .board-col-name{font-size:13px;font-weight:700;color:var(--text-2);text-transform:uppercase;letter-spacing:.7px;flex:1}
 .board-col-count{font-size:11px;color:var(--text-3)}
-.board-task{background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px;margin-bottom:6px;cursor:pointer;transition:all .15s}
-.board-task:active{transform:scale(.98)}
+.board-col-tasks{min-height:8px}
+.board-task{background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px;margin-bottom:6px;cursor:grab;transition:all .15s}
+.board-task:active{cursor:grabbing}
+.board-task.dragging{opacity:.4;transform:scale(.97)}
 .board-task-title{font-size:13px;font-weight:500;line-height:1.4}
 .board-task.done .board-task-title{text-decoration:line-through;color:var(--text-3)}
+.board-drag-handle{color:var(--text-3);display:flex;align-items:center;flex-shrink:0;margin-top:1px;cursor:grab;touch-action:none}
 
 /* STATS */
 .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
@@ -203,7 +218,7 @@ body{background:var(--bg-base);color:var(--text-1);font-family:-apple-system,Bli
 .add-sub-btn{background:var(--accent-dim);border:1px solid var(--accent);color:var(--accent);border-radius:var(--radius-sm);padding:0 14px;font-size:20px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center}
 .subtask-list{margin-top:4px}
 .subtask-item{display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--bg-input);border-radius:var(--radius-sm);margin-bottom:5px;font-size:13px}
-.subtask-item .rm{margin-left:auto;color:var(--danger);cursor:pointer;font-size:17px}
+.subtask-item .rm{margin-left:auto;color:var(--danger);cursor:pointer;display:flex;align-items:center}
 .btn-row{display:flex;gap:10px;margin-top:18px}
 .btn{flex:1;padding:13px;border-radius:var(--radius-md);border:none;font-size:15px;font-weight:600;cursor:pointer;transition:all .15s}
 .btn-primary{background:var(--accent);color:#fff}
@@ -233,6 +248,24 @@ body{background:var(--bg-base);color:var(--text-1);font-family:-apple-system,Bli
 /* EMPTY STATE */
 .empty{text-align:center;padding:40px 24px;color:var(--text-3)}
 .empty-icon{font-size:40px;margin-bottom:10px}
+
+/* LUCIDE ICONS */
+[data-lucide]{width:1em;height:1em;stroke-width:2}
+.ico-sm{width:14px;height:14px}
+.ico-md{width:18px;height:18px}
+.ico-lg{width:22px;height:22px}
+.ico-xl{width:28px;height:28px}
+.header-logo [data-lucide]{width:18px;height:18px;color:#fff}
+.tab-icon{display:flex;align-items:center;justify-content:center;margin-bottom:2px}
+.tab-icon [data-lucide]{width:17px;height:17px}
+.back-btn [data-lucide]{width:16px;height:16px}
+.section-action-btn [data-lucide]{width:15px;height:15px;display:block}
+.add-task-inline [data-lucide]{width:15px;height:15px}
+.empty-icon [data-lucide]{width:40px;height:40px;color:var(--text-3)}
+.umi-icon [data-lucide]{width:16px;height:16px}
+.meta-pill [data-lucide]{width:11px;height:11px}
+.proj-list-item [data-lucide]{width:16px;height:16px}
+.fab [data-lucide]{width:24px;height:24px}
 .empty-msg{font-size:14px}
 
 /* TOAST */
@@ -250,14 +283,14 @@ body{background:var(--bg-base);color:var(--text-1);font-family:-apple-system,Bli
 <body>
 
 <header class="header">
-  <div class="header-logo">✦</div>
+  <div class="header-logo"><i data-lucide="sparkles"></i></div>
   <div>
     <div class="header-title">TaskFlow</div>
     <div class="header-sub" id="header-sub">Buenos días</div>
   </div>
   <div class="header-actions">
-    <button class="icon-btn" onclick="toggleSearch()" title="Buscar">🔍</button>
-    <button class="icon-btn user-avatar-btn" onclick="toggleUserMenu()" title="Cuenta" id="user-avatar-btn">🙂</button>
+    <button class="icon-btn" onclick="toggleSearch()" title="Buscar"><i data-lucide="search" class="ico-md"></i></button>
+    <button class="icon-btn user-avatar-btn" onclick="toggleUserMenu()" title="Cuenta" id="user-avatar-btn"><i data-lucide="user" class="ico-md"></i></button>
   </div>
 </header>
 
@@ -265,20 +298,20 @@ body{background:var(--bg-base);color:var(--text-1);font-family:-apple-system,Bli
 <div class="user-menu-overlay" id="user-menu-overlay" onclick="closeUserMenu()">
   <div class="user-menu" onclick="event.stopPropagation()">
     <div class="user-menu-item" onclick="openSummaryFromMenu()">
-      <span class="umi-icon">📊</span>
+      <span class="umi-icon"><i data-lucide="bar-chart-3"></i></span>
       <span>Resumen</span>
     </div>
     <div class="user-menu-item" onclick="requestNotifPermission();closeUserMenu()">
-      <span class="umi-icon">🔔</span>
+      <span class="umi-icon"><i data-lucide="bell"></i></span>
       <span>Notificaciones</span>
     </div>
   </div>
 </div>
 
 <nav class="tabs">
-  <div class="tab active" onclick="switchTab('tasks')" id="tab-tasks"><span class="tab-icon">☑</span>Mis tareas</div>
-  <div class="tab" onclick="switchTab('projects')" id="tab-projects"><span class="tab-icon">📁</span>Proyectos</div>
-  <div class="tab" onclick="switchTab('today')" id="tab-today"><span class="tab-icon">📅</span>Hoy</div>
+  <div class="tab active" onclick="switchTab('tasks')" id="tab-tasks"><span class="tab-icon"><i data-lucide="square-check-big"></i></span>Mis tareas</div>
+  <div class="tab" onclick="switchTab('projects')" id="tab-projects"><span class="tab-icon"><i data-lucide="folder"></i></span>Proyectos</div>
+  <div class="tab" onclick="switchTab('today')" id="tab-today"><span class="tab-icon"><i data-lucide="calendar-days"></i></span>Hoy</div>
 </nav>
 
 <main class="content" id="main-content">
@@ -286,7 +319,7 @@ body{background:var(--bg-base);color:var(--text-1);font-family:-apple-system,Bli
   <!-- MIS TAREAS -->
   <div id="page-tasks" class="page active">
     <div class="search-bar hidden" id="search-bar">
-      <span style="color:var(--text-3);font-size:16px">🔍</span>
+      <span style="color:var(--text-3);display:flex"><i data-lucide="search" class="ico-md"></i></span>
       <input type="text" id="search-input" placeholder="Buscar tareas..." oninput="renderMyTasks()">
     </div>
     <div class="chips" id="filter-chips">
@@ -302,7 +335,7 @@ body{background:var(--bg-base);color:var(--text-1);font-family:-apple-system,Bli
     <div class="section-label" style="font-size:11px;font-weight:700;letter-spacing:1px;color:var(--text-3);text-transform:uppercase;margin-bottom:10px">Mis proyectos</div>
     <div id="projects-list"></div>
     <div style="margin-top:12px">
-      <div class="add-task-inline" onclick="openNewProject()">＋ Nuevo proyecto</div>
+      <div class="add-task-inline" onclick="openNewProject()"><i data-lucide="plus"></i> Nuevo proyecto</div>
     </div>
   </div>
 
@@ -315,13 +348,21 @@ body{background:var(--bg-base);color:var(--text-1);font-family:-apple-system,Bli
   </div>
 </main>
 
-<button class="fab" id="main-fab" onclick="openNewTask(null)" aria-label="Nueva tarea">＋</button>
+<div class="fab-scrim" id="fab-scrim" onclick="closeFabMenus()"></div>
+
+<div class="fab-wrap" id="main-fab-wrap">
+  <div class="fab-menu" id="main-fab-menu">
+    <div class="fab-menu-item" onclick="fabAction('task')"><span class="fmi-icon"><i data-lucide="square-check-big"></i></span>Nueva tarea</div>
+    <div class="fab-menu-item" onclick="fabAction('project')"><span class="fmi-icon"><i data-lucide="folder-plus"></i></span>Nuevo proyecto</div>
+  </div>
+  <button class="fab" id="main-fab" onclick="toggleFabMenu()" aria-label="Crear"><i data-lucide="plus" id="main-fab-icon"></i></button>
+</div>
 
 <!-- ── SUMMARY (Resumen) PAGE ───────────────── -->
 <div id="summary-page">
   <div class="proj-detail-header">
-    <button class="back-btn" onclick="closeSummary()">← Volver</button>
-    <div class="proj-detail-title">📊 Resumen</div>
+    <button class="back-btn" onclick="closeSummary()"><i data-lucide="chevron-left"></i> Volver</button>
+    <div class="proj-detail-title" style="display:flex;align-items:center;gap:8px"><i data-lucide="bar-chart-3" class="ico-md"></i> Resumen</div>
   </div>
   <div class="proj-detail-content">
     <div class="stats-grid" id="stats-grid"></div>
@@ -333,33 +374,39 @@ body{background:var(--bg-base);color:var(--text-1);font-family:-apple-system,Bli
 <!-- ── PROJECT DETAIL ───────────────────────── -->
 <div id="proj-detail-page">
   <div class="proj-detail-header">
-    <button class="back-btn" onclick="closeProjectDetail()">← Proyectos</button>
+    <button class="back-btn" onclick="closeProjectDetail()"><i data-lucide="chevron-left"></i> Proyectos</button>
     <div style="flex:1;min-width:0">
       <div class="proj-detail-title" id="pd-title"></div>
       <div class="proj-detail-sub" id="pd-sub"></div>
     </div>
-    <button class="icon-btn" onclick="openEditProject(currentProjectId)" title="Editar">✏</button>
+    <button class="icon-btn" onclick="openEditProject(currentProjectId)" title="Editar"><i data-lucide="pencil" class="ico-sm"></i></button>
   </div>
   <div class="proj-header-progress" id="pd-progress-wrap">
     <div class="proj-progress-bar"><div class="proj-progress-fill" id="pd-progress-fill"></div></div>
     <div class="proj-progress-label" id="pd-progress-label"></div>
   </div>
   <div class="proj-view-tabs">
-    <div class="proj-view-tab active" onclick="switchProjView('list',this)">☰ Lista</div>
-    <div class="proj-view-tab" onclick="switchProjView('board',this)">⊞ Tablero</div>
-    <div class="proj-view-tab" onclick="switchProjView('overview',this)">◎ Resumen</div>
+    <div class="proj-view-tab active" onclick="switchProjView('list',this)"><i data-lucide="list" class="ico-sm"></i> Lista</div>
+    <div class="proj-view-tab" onclick="switchProjView('board',this)"><i data-lucide="columns-3" class="ico-sm"></i> Tablero</div>
+    <div class="proj-view-tab" onclick="switchProjView('overview',this)"><i data-lucide="circle-dot" class="ico-sm"></i> Resumen</div>
   </div>
   <div class="proj-detail-content" id="pd-content"></div>
   <!-- FAB inside project -->
-  <button class="fab" id="proj-fab" style="display:none" onclick="openNewTask(currentProjectId)" aria-label="Nueva tarea">＋</button>
+  <div class="fab-wrap" id="proj-fab-wrap" style="display:none">
+    <div class="fab-menu" id="proj-fab-menu">
+      <div class="fab-menu-item" onclick="fabAction('task', currentProjectId)"><span class="fmi-icon"><i data-lucide="square-check-big"></i></span>Nueva tarea</div>
+      <div class="fab-menu-item" onclick="fabAction('section', currentProjectId)"><span class="fmi-icon"><i data-lucide="folder-tree"></i></span>Nueva sección</div>
+    </div>
+    <button class="fab" id="proj-fab" onclick="toggleFabMenu('proj')" aria-label="Crear"><i data-lucide="plus" id="proj-fab-icon"></i></button>
+  </div>
 </div>
 
 <!-- ── TASK DETAIL ──────────────────────────── -->
 <div id="detail-page">
   <div class="detail-header">
-    <button class="back-btn" onclick="closeDetail()">← Volver</button>
+    <button class="back-btn" onclick="closeDetail()"><i data-lucide="chevron-left"></i> Volver</button>
     <div style="margin-left:auto;display:flex;gap:8px">
-      <button class="icon-btn" onclick="editCurrentTask()">✏</button>
+      <button class="icon-btn" onclick="editCurrentTask()"><i data-lucide="pencil" class="ico-sm"></i></button>
     </div>
   </div>
   <div class="detail-content" id="detail-content"></div>
@@ -390,7 +437,7 @@ body{background:var(--bg-base);color:var(--text-1);font-family:-apple-system,Bli
         <label>Subtareas</label>
         <div class="subtask-input-row">
           <input type="text" id="f-sub" placeholder="Agregar subtarea..." onkeydown="if(event.key==='Enter')addSubtask()">
-          <button class="add-sub-btn" onclick="addSubtask()">+</button>
+          <button class="add-sub-btn" onclick="addSubtask()"><i data-lucide="plus" class="ico-md"></i></button>
         </div>
         <div class="subtask-list" id="subtask-list"></div>
       </div>
@@ -398,7 +445,7 @@ body{background:var(--bg-base);color:var(--text-1);font-family:-apple-system,Bli
         <button class="btn btn-ghost" onclick="closeSheet('task-overlay')">Cancelar</button>
         <button class="btn btn-primary" onclick="saveTask()">Guardar</button>
       </div>
-      <button class="btn btn-danger" id="delete-btn" style="width:100%;margin-top:10px;display:none" onclick="deleteTask()">🗑 Eliminar tarea</button>
+      <button class="btn btn-danger" id="delete-btn" style="width:100%;margin-top:10px;display:none;align-items:center;justify-content:center;gap:6px" onclick="deleteTask()"><i data-lucide="trash-2" class="ico-sm"></i> Eliminar tarea</button>
     </div>
   </div>
 </div>
@@ -422,7 +469,7 @@ body{background:var(--bg-base);color:var(--text-1);font-family:-apple-system,Bli
         <button class="btn btn-ghost" onclick="closeSheet('proj-overlay')">Cancelar</button>
         <button class="btn btn-primary" onclick="saveProject()">Guardar</button>
       </div>
-      <button class="btn btn-danger" id="delete-proj-btn" style="width:100%;margin-top:10px;display:none" onclick="deleteProject()">🗑 Eliminar proyecto</button>
+      <button class="btn btn-danger" id="delete-proj-btn" style="width:100%;margin-top:10px;display:none;align-items:center;justify-content:center;gap:6px" onclick="deleteProject()"><i data-lucide="trash-2" class="ico-sm"></i> Eliminar proyecto</button>
     </div>
   </div>
 </div>
@@ -529,9 +576,7 @@ function switchTab(tab) {
   document.getElementById('tab-'+tab).classList.add('active');
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById('page-'+tab).classList.add('active');
-  const fab = document.getElementById('main-fab');
-  fab.style.display = 'flex';
-  fab.onclick = tab==='projects' ? openNewProject : ()=>openNewTask(null);
+  closeFabMenus();
   render();
 }
 
@@ -539,6 +584,36 @@ function render() {
   if(currentTab==='tasks')    renderMyTasks();
   if(currentTab==='projects') renderProjects();
   if(currentTab==='today')    renderToday();
+  callLucide();
+}
+
+/* ═══════════════════════════════════════
+   FAB POPOVER MENU
+═══════════════════════════════════════ */
+function toggleFabMenu(which) {
+  const suffix = which==='proj' ? 'proj' : 'main';
+  const menu = document.getElementById(suffix+'-fab-menu');
+  const btn  = document.getElementById(suffix+'-fab');
+  const isOpening = !menu.classList.contains('open');
+  closeFabMenus();
+  if (isOpening) {
+    menu.classList.add('open');
+    btn.classList.add('menu-open');
+    document.getElementById('fab-scrim').classList.add('open');
+  }
+}
+
+function closeFabMenus() {
+  document.querySelectorAll('.fab-menu').forEach(m=>m.classList.remove('open'));
+  document.querySelectorAll('.fab').forEach(b=>b.classList.remove('menu-open'));
+  document.getElementById('fab-scrim').classList.remove('open');
+}
+
+function fabAction(type, projId) {
+  closeFabMenus();
+  if (type==='task')    openNewTask(projId||null);
+  if (type==='project') openNewProject();
+  if (type==='section') openNewSectionSheet(projId||null);
 }
 
 /* ═══════════════════════════════════════
@@ -554,6 +629,7 @@ function openSummaryFromMenu() {
   closeUserMenu();
   renderStats();
   document.getElementById('summary-page').classList.add('open');
+  callLucide();
 }
 function closeSummary() {
   document.getElementById('summary-page').classList.remove('open');
@@ -601,7 +677,7 @@ function renderMyTasks() {
     const secTasks = myTasks.filter(t=>t.sectionId===sec.id);
     html += renderSectionGroup(sec.id, sec.name, secTasks, null, false);
   });
-  html += `<div class="add-task-inline" onclick="openNewSectionSheet(null)" style="margin-top:4px">＋ Agregar sección</div>`;
+  html += `<div class="add-task-inline" onclick="openNewSectionSheet(null)" style="margin-top:4px"><i data-lucide="folder-plus" class="ico-sm"></i> Agregar sección</div>`;
   container.innerHTML = html;
 }
 
@@ -612,17 +688,17 @@ function renderSectionGroup(secId, secName, taskList, projId, isDefault) {
   return `
   <div class="section-group" id="sg-${secId}">
     <div class="section-header" onclick="toggleSection('${secId}')">
-      <span class="section-chevron" id="chev-${secId}">▾</span>
+      <span class="section-chevron" id="chev-${secId}"><i data-lucide="chevron-down" class="ico-sm"></i></span>
       <span class="section-name" id="sn-${secId}">${esc(secName)}</span>
       <span class="section-count">${count}</span>
       <div class="section-actions" onclick="event.stopPropagation()">
-        ${canDelete?`<button class="section-action-btn" onclick="deleteSectionConfirm('${secId}')" title="Eliminar sección">🗑</button>`:''}
-        <button class="section-action-btn" onclick="openNewTask(${projId?`'${projId}'`:'null'},'${secId}')" title="Agregar tarea">＋</button>
+        ${canDelete?`<button class="section-action-btn" onclick="deleteSectionConfirm('${secId}')" title="Eliminar sección"><i data-lucide="trash-2"></i></button>`:''}
+        <button class="section-action-btn" onclick="openNewTask(${projId?`'${projId}'`:'null'},'${secId}')" title="Agregar tarea"><i data-lucide="plus"></i></button>
       </div>
     </div>
     <div class="section-body" id="sb-${secId}">
       ${taskHTML}
-      <div class="add-task-inline" onclick="openNewTask(${projId?`'${projId}'`:'null'},'${secId}')">＋ Agregar tarea</div>
+      <div class="add-task-inline" onclick="openNewTask(${projId?`'${projId}'`:'null'},'${secId}')"><i data-lucide="plus" class="ico-sm"></i> Agregar tarea</div>
     </div>
   </div>`;
 }
@@ -641,7 +717,7 @@ function toggleSection(id) {
 function renderProjects() {
   const container = document.getElementById('projects-list');
   if(!projects.length) {
-    container.innerHTML=`<div class="empty"><div class="empty-icon">📁</div><div class="empty-msg">Crea tu primer proyecto</div></div>`;
+    container.innerHTML=`<div class="empty"><div class="empty-icon"><i data-lucide="folder"></i></div><div class="empty-msg">Crea tu primer proyecto</div></div>`;
     return;
   }
   container.innerHTML = projects.map(p=>{
@@ -651,7 +727,7 @@ function renderProjects() {
       <div class="proj-dot" style="background:${p.color}"></div>
       <span class="proj-list-name">${p.icon} ${esc(p.name)}</span>
       <span class="proj-list-count">${pts.length-done} pendientes</span>
-      <span style="color:var(--text-3);font-size:16px">›</span>
+      <span style="color:var(--text-3);display:flex"><i data-lucide="chevron-right" class="ico-md"></i></span>
     </div>`;
   }).join('');
 }
@@ -681,12 +757,13 @@ function openProjectDetail(projId) {
 
   renderProjectView('list');
   document.getElementById('proj-detail-page').classList.add('open');
-  document.getElementById('proj-fab').style.display='flex';
+  document.getElementById('proj-fab-wrap').style.display='flex';
 }
 
 function closeProjectDetail() {
   document.getElementById('proj-detail-page').classList.remove('open');
-  document.getElementById('proj-fab').style.display='none';
+  document.getElementById('proj-fab-wrap').style.display='none';
+  closeFabMenus();
   currentProjectId = null;
   render();
 }
@@ -702,6 +779,7 @@ function renderProjectView(view) {
   if(view==='list')     renderProjList();
   if(view==='board')    renderProjBoard();
   if(view==='overview') renderProjOverview();
+  callLucide();
 }
 
 /* LIST VIEW */
@@ -719,7 +797,7 @@ function renderProjList() {
     const secTasks = allTasks.filter(t=>t.sectionId===sec.id);
     html += renderSectionGroup(sec.id, sec.name, secTasks, projId, false);
   });
-  html += `<div class="add-task-inline" onclick="openNewSectionSheet('${projId}')" style="margin-top:4px">＋ Agregar sección</div>`;
+  html += `<div class="add-task-inline" onclick="openNewSectionSheet('${projId}')" style="margin-top:4px"><i data-lucide="folder-plus" class="ico-sm"></i> Agregar sección</div>`;
   document.getElementById('pd-content').innerHTML = html;
 }
 
@@ -729,35 +807,134 @@ function renderProjBoard() {
   const projSections = sections.filter(s=>s.projectId===projId).sort((a,b)=>a.order-b.order);
   const allTasks = tasks.filter(t=>t.project===projId);
 
+  // Real sectionId used for storage: MY_TASKS_DEFAULT_SECTION for the default column.
   const allCols = [
-    {id: MY_TASKS_DEFAULT_SECTION+'_'+projId, name:'Tareas recientes', tasks: allTasks.filter(t=>!t.sectionId||t.sectionId===MY_TASKS_DEFAULT_SECTION)},
+    {id: MY_TASKS_DEFAULT_SECTION, name:'Tareas recientes', tasks: allTasks.filter(t=>!t.sectionId||t.sectionId===MY_TASKS_DEFAULT_SECTION)},
     ...projSections.map(s=>({id:s.id, name:s.name, tasks: allTasks.filter(t=>t.sectionId===s.id)}))
   ];
 
   const colsHTML = allCols.map(col=>`
-    <div class="board-col">
+    <div class="board-col" data-section-id="${col.id}">
       <div class="board-col-header">
         <span class="board-col-name">${esc(col.name)}</span>
         <span class="board-col-count">${col.tasks.length}</span>
       </div>
+      <div class="board-col-tasks" data-section-id="${col.id}">
       ${col.tasks.map(t=>`
-        <div class="board-task ${t.done?'done':''}">
+        <div class="board-task ${t.done?'done':''}" data-task-id="${t.id}">
           <div style="display:flex;align-items:flex-start;gap:8px">
             <div role="button" tabindex="0" class="task-check ${t.done?'checked':''}" style="width:18px;height:18px;margin-top:1px" onclick="toggleDone('${t.id}')"></div>
             <div style="flex:1;cursor:pointer" onclick="openDetail('${t.id}')">
               <div class="board-task-title">${esc(t.title)}</div>
-              ${t.due?`<div style="font-size:11px;color:var(--text-3);margin-top:5px">📅 ${formatDate(new Date(t.due))}</div>`:''}
+              ${t.due?`<div style="font-size:11px;color:var(--text-3);margin-top:5px;display:flex;align-items:center;gap:4px"><i data-lucide="calendar" class="ico-sm"></i> ${formatDate(new Date(t.due))}</div>`:''}
               ${t.subtasks.length?`<div style="font-size:11px;color:var(--text-3);margin-top:4px">${t.subtasks.filter(s=>s.done).length}/${t.subtasks.length} subtareas</div>`:''}
             </div>
+            <span class="board-drag-handle" title="Arrastrar" onpointerdown="boardDragStart(event,'${t.id}')"><i data-lucide="grip-vertical" class="ico-sm"></i></span>
           </div>
         </div>`).join('')}
-      <div class="add-task-inline" style="margin-top:4px;font-size:12px" onclick="openNewTask('${projId}','${col.id}')">＋</div>
+      </div>
+      <div class="add-task-inline" style="margin-top:4px;font-size:12px;justify-content:center" onclick="openNewTask('${projId}','${col.id}')"><i data-lucide="plus" class="ico-sm"></i></div>
     </div>`).join('');
 
   document.getElementById('pd-content').innerHTML = `<div class="board-cols">${colsHTML}</div>`;
 }
 
 /* OVERVIEW */
+/* ═══════════════════════════════════════
+   BOARD DRAG & DROP (Pointer Events —
+   works on mouse, touch, and stylus alike,
+   important for the Android/Median.co APK)
+═══════════════════════════════════════ */
+let dragState = null;
+
+function boardDragStart(ev, taskId) {
+  ev.preventDefault();
+  const card = document.querySelector(`.board-task[data-task-id="${taskId}"]`);
+  if (!card) return;
+  const rect = card.getBoundingClientRect();
+
+  const ghost = card.cloneNode(true);
+  ghost.classList.add('board-drag-ghost');
+  ghost.style.cssText = `position:fixed;left:${rect.left}px;top:${rect.top}px;width:${rect.width}px;pointer-events:none;z-index:999;opacity:.92;box-shadow:0 8px 24px #00000077;transform:rotate(-1.5deg);transition:none;`;
+  document.body.appendChild(ghost);
+
+  card.classList.add('dragging');
+
+  dragState = {
+    taskId,
+    card,
+    ghost,
+    offsetX: ev.clientX - rect.left,
+    offsetY: ev.clientY - rect.top,
+    lastCol: null,
+  };
+
+  window.addEventListener('pointermove', boardDragMove);
+  window.addEventListener('pointerup', boardDragEnd);
+  window.addEventListener('pointercancel', boardDragEnd);
+}
+
+function boardDragMove(ev) {
+  if (!dragState) return;
+  ev.preventDefault();
+  dragState.ghost.style.left = (ev.clientX - dragState.offsetX) + 'px';
+  dragState.ghost.style.top  = (ev.clientY - dragState.offsetY) + 'px';
+
+  // Temporarily hide ghost to detect what's underneath the pointer
+  dragState.ghost.style.display = 'none';
+  const elUnder = document.elementFromPoint(ev.clientX, ev.clientY);
+  dragState.ghost.style.display = '';
+
+  const col = elUnder ? elUnder.closest('.board-col') : null;
+  if (dragState.lastCol && dragState.lastCol !== col) {
+    dragState.lastCol.classList.remove('drag-over');
+  }
+  if (col) {
+    col.classList.add('drag-over');
+  }
+  dragState.lastCol = col;
+
+  // Auto-scroll the board horizontally near screen edges
+  const boardEl = document.querySelector('.board-cols');
+  if (boardEl) {
+    const edge = 50;
+    const bRect = boardEl.getBoundingClientRect();
+    if (ev.clientX < bRect.left + edge) boardEl.scrollLeft -= 12;
+    else if (ev.clientX > bRect.right - edge) boardEl.scrollLeft += 12;
+  }
+}
+
+function boardDragEnd(ev) {
+  if (!dragState) return;
+  const { taskId, card, ghost, lastCol } = dragState;
+
+  window.removeEventListener('pointermove', boardDragMove);
+  window.removeEventListener('pointerup', boardDragEnd);
+  window.removeEventListener('pointercancel', boardDragEnd);
+
+  document.querySelectorAll('.board-col.drag-over').forEach(c=>c.classList.remove('drag-over'));
+  card.classList.remove('dragging');
+  ghost.remove();
+
+  if (lastCol) {
+    const newSectionId = lastCol.getAttribute('data-section-id');
+    moveTaskToSection(taskId, newSectionId);
+  }
+
+  dragState = null;
+}
+
+function moveTaskToSection(taskId, newSectionId) {
+  const t = tasks.find(x=>x.id===taskId);
+  if (!t || t.sectionId === newSectionId) return;
+  tasks = tasks.map(x => x.id===taskId ? {...x, sectionId: newSectionId} : x);
+  save();
+  showToast('↔ Tarea movida');
+  if (document.getElementById('proj-detail-page').classList.contains('open')) {
+    renderProjectView(currentProjView);
+  }
+}
+
 function renderProjOverview() {
   const projId = currentProjectId;
   const proj   = projects.find(p=>p.id===projId);
@@ -793,7 +970,7 @@ function renderProjOverview() {
       <div style="font-size:11px;font-weight:700;letter-spacing:1px;color:var(--text-3);text-transform:uppercase;margin-bottom:10px">Actividad reciente</div>
       ${allTasks.slice(0,5).map(t=>`
         <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)">
-          <span style="font-size:14px">${t.done?'✅':'⏳'}</span>
+          <span style="font-size:14px;display:flex">${t.done?'<i data-lucide="check-circle-2" class="ico-sm" style="color:var(--success)"></i>':'<i data-lucide="clock" class="ico-sm" style="color:var(--text-3)"></i>'}</span>
           <span style="font-size:13px;color:${t.done?'var(--text-3)':'var(--text-1)'};${t.done?'text-decoration:line-through':''}">${esc(t.title)}</span>
         </div>`).join('')}
     </div>`;
@@ -815,7 +992,7 @@ function taskCardHTML(t) {
       ${t.desc?`<div class="task-desc">${esc(t.desc)}</div>`:''}
       <div class="task-meta">
         ${proj?`<span style="font-size:11px;color:${proj.color};background:${proj.color}22;padding:2px 7px;border-radius:8px">${proj.icon} ${esc(proj.name)}</span>`:''}
-        ${dueStr?`<span class="meta-pill date ${isDue&&!t.done?'overdue':''}">📅 ${dueStr}</span>`:''}
+        ${dueStr?`<span class="meta-pill date ${isDue&&!t.done?'overdue':''}"><i data-lucide="calendar" class="ico-sm"></i> ${dueStr}</span>`:''}
         ${t.subtasks.length?`<span class="subtask-count">${dc}/${t.subtasks.length} sub</span>`:''}
       </div>
       ${t.subtasks.length?`<div class="subtask-bar"><div class="subtask-fill" style="width:${pct}%"></div></div>`:''}
@@ -834,6 +1011,7 @@ function renderToday() {
   const ul=tasks.filter(t=>!t.done&&t.due&&new Date(t.due)>todayEnd&&new Date(t.due)<=in7);
   document.getElementById('today-list').innerHTML=tl.length?tl.map(t=>taskCardHTML(t)).join(''):`<div class="empty" style="padding:16px 0"><div class="empty-msg">Sin tareas para hoy 🎉</div></div>`;
   document.getElementById('upcoming-list').innerHTML=ul.length?ul.map(t=>taskCardHTML(t)).join(''):`<div class="empty" style="padding:16px 0"><div class="empty-msg">Sin tareas próximas</div></div>`;
+  callLucide();
 }
 
 /* ═══════════════════════════════════════
@@ -894,6 +1072,7 @@ function openDetail(id) {
         </div>`).join('')}
     </div>`:''}`;
   document.getElementById('detail-page').classList.add('open');
+  callLucide();
 }
 
 function closeDetail() {
@@ -930,7 +1109,7 @@ function openEditTask(id) {
   document.getElementById('f-title').value=t.title;
   document.getElementById('f-desc').value=t.desc||'';
   document.getElementById('f-due').value=t.due?t.due.slice(0,16):'';
-  document.getElementById('delete-btn').style.display='block';
+  document.getElementById('delete-btn').style.display='flex';
   populateProjectSelect(t.project||'');
   populateSectionSelect(t.project||'', t.sectionId||'');
   renderFormSubtasks();
@@ -1029,7 +1208,7 @@ function openEditProject(id) {
   editingProjId=id;
   document.getElementById('proj-sheet-title').textContent='Editar proyecto';
   document.getElementById('pf-name').value=p.name;
-  document.getElementById('delete-proj-btn').style.display='block';
+  document.getElementById('delete-proj-btn').style.display='flex';
   selectedEmoji=p.icon; selectedColor=p.color;
   buildEmojiPicker(); buildColorPicker();
   openSheet('proj-overlay');
@@ -1091,7 +1270,7 @@ function addSubtask() {
   inp.value='';renderFormSubtasks();
 }
 function removeFormSubtask(id){formSubtasks=formSubtasks.filter(s=>s.id!==id);renderFormSubtasks();}
-function renderFormSubtasks(){document.getElementById('subtask-list').innerHTML=formSubtasks.map(s=>`<div class="subtask-item"><span>${esc(s.title)}</span><span class="rm" onclick="removeFormSubtask('${s.id}')">✕</span></div>`).join('');}
+function renderFormSubtasks(){document.getElementById('subtask-list').innerHTML=formSubtasks.map(s=>`<div class="subtask-item"><span>${esc(s.title)}</span><span class="rm" onclick="removeFormSubtask('${s.id}')"><i data-lucide="x" class="ico-sm"></i></span></div>`).join('');callLucide();}
 
 
 function toggleSearch() {
@@ -1119,7 +1298,7 @@ function selectColor(c){selectedColor=c;buildColorPicker();}
 /* ═══════════════════════════════════════
    SHEET
 ═══════════════════════════════════════ */
-function openSheet(id){document.getElementById(id).classList.add('open');}
+function openSheet(id){closeFabMenus();document.getElementById(id).classList.add('open');callLucide();}
 function closeSheet(id){document.getElementById(id).classList.remove('open');}
 
 /* ═══════════════════════════════════════
@@ -1149,6 +1328,20 @@ function showToast(msg) {
   el.classList.add('show');
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+/* ═══════════════════════════════════════
+   LUCIDE ICONS HELPER
+═══════════════════════════════════════ */
+let lucideRetries = 0;
+function callLucide() {
+  if (window.lucide && typeof window.lucide.createIcons === 'function') {
+    window.lucide.createIcons();
+  } else if (lucideRetries < 20) {
+    // Lucide loads with `defer`; may not be ready on first paint.
+    lucideRetries++;
+    setTimeout(callLucide, 150);
+  }
 }
 
 /* ═══════════════════════════════════════
