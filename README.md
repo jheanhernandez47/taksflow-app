@@ -1,3 +1,4 @@
+[README.md](https://github.com/user-attachments/files/29166272/README.md)
 # TaskFlow — PWA de Gestión de Tareas
 
 App de tareas offline-first construida como PWA, lista para Netlify y Median.co.
@@ -35,17 +36,26 @@ taskapp/
 
 ## Funcionalidades
 
-- ✅ Tareas con título, descripción, prioridad y fecha límite
-- 📁 Proyectos con color e ícono personalizados
-- 🏷 Categorías (Personal, Trabajo, Escuela, Salud, Finanzas)
-- ✓ Subtareas con progreso visual
-- 📊 Resumen estadístico
-- 🔔 Notificaciones de vencimiento
+- ✅ Tareas con título, descripción, fecha límite y subtareas
+- 📁 Proyectos estilo Asana (vistas Lista / Tablero / Resumen)
+- 📂 Secciones personalizables por proyecto y en "Mis tareas" (con "Tareas recientes" por defecto)
+- 🖱️ **Drag & drop** en el Tablero para mover tareas entre secciones (mouse y táctil)
+- ➕ **Botón flotante con menú** — un toque despliega "Nueva tarea" / "Nuevo proyecto"
+- 🧭 **Íconos Lucide** en toda la interfaz de navegación, botones y encabezados
+- 👤 Menú de usuario (esquina superior derecha) con acceso al Resumen y notificaciones
+- 👤 **Pantalla de perfil completa** — foto (subida desde el dispositivo, guardada como base64 en localStorage), nombre editable con iniciales automáticas como avatar de respaldo, notificaciones, exportar/importar datos en .json, y "Acerca de"
+- 🔍 Búsqueda de tareas
+- 🔔 Notificaciones de vencimiento (con verificación de soporte del navegador)
 - 🌙 Dark mode nativo
-- 📶 Funciona 100% offline (datos en localStorage)
+- 📶 Funciona 100% offline — datos en `localStorage`, Service Worker cachea los recursos (incluido el script de íconos tras la primera carga)
 - 📱 Interfaz adaptada para pantallas móviles
+
+## Notas técnicas
+
+- Los íconos se cargan desde `unpkg.com/lucide` la primera vez que hay conexión; el Service Worker los cachea para uso offline después. Si el ícono no carga (sin conexión y sin caché previo), la interfaz no se rompe — simplemente el espacio queda vacío y los botones siguen siendo funcionales.
+- El drag & drop usa Pointer Events (no el HTML5 Drag and Drop API clásico), para que funcione igual con mouse, dedo o stylus — necesario para que se sienta nativo dentro del APK generado con Median.co.
 
 ## Datos
 
 Todos los datos se guardan en `localStorage` del dispositivo.
-No requiere internet ni servidor backend.
+No requiere internet ni servidor backend (salvo para la carga inicial de íconos).
