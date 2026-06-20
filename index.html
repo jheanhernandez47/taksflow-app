@@ -50,20 +50,19 @@ body{background:var(--bg-base);color:var(--text-1);font-family:-apple-system,Bli
 .icon-btn{width:36px;height:36px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-2);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
 .icon-btn:active{background:var(--bg-hover);transform:scale(.94)}
 
-/* TABS */
-.tabs{display:flex;background:var(--bg-surface);border-bottom:1px solid var(--border);flex-shrink:0;overflow-x:auto;scrollbar-width:none}
-.tabs::-webkit-scrollbar{display:none}
-.tab{flex:1 0 auto;padding:10px 14px;font-size:13px;color:var(--text-2);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all .15s;text-align:center}
-.tab.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:600}
-.tab .tab-icon{font-size:16px;display:block;margin-bottom:2px}
+/* BOTTOM NAV */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;display:flex;background:var(--bg-surface);border-top:1px solid var(--border);flex-shrink:0;z-index:120;padding-bottom:env(safe-area-inset-bottom,0)}
+.bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:9px 4px 8px;color:var(--text-3);cursor:pointer;transition:color .15s;font-size:10.5px;font-weight:500}
+.bnav-item [data-lucide]{width:21px;height:21px}
+.bnav-item.active{color:var(--accent)}
 
 /* CONTENT */
-.content{flex:1;overflow-y:auto;padding:14px 14px 80px;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+.content{flex:1;overflow-y:auto;padding:14px 14px 96px;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
 .content::-webkit-scrollbar{width:4px}
 .content::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
 
 /* FAB */
-.fab-wrap{position:fixed;bottom:24px;right:20px;z-index:100;display:flex;flex-direction:column;align-items:flex-end;gap:10px}
+.fab-wrap{position:fixed;bottom:calc(72px + env(safe-area-inset-bottom,0px));right:20px;z-index:100;display:flex;flex-direction:column;align-items:flex-end;gap:10px}
 .fab{width:56px;height:56px;background:var(--accent);border-radius:50%;border:none;color:#fff;cursor:pointer;box-shadow:0 4px 20px #6c63ff33,0 2px 8px #00000066;display:flex;align-items:center;justify-content:center;transition:transform .2s,box-shadow .2s;flex-shrink:0}
 .fab:active{transform:scale(.92)}
 .fab.menu-open{transform:rotate(45deg)}
@@ -308,12 +307,6 @@ body{background:var(--bg-base);color:var(--text-1);font-family:-apple-system,Bli
   </div>
 </div>
 
-<nav class="tabs">
-  <div class="tab active" onclick="switchTab('tasks')" id="tab-tasks"><span class="tab-icon"><i data-lucide="square-check-big"></i></span>Mis tareas</div>
-  <div class="tab" onclick="switchTab('projects')" id="tab-projects"><span class="tab-icon"><i data-lucide="folder"></i></span>Proyectos</div>
-  <div class="tab" onclick="switchTab('today')" id="tab-today"><span class="tab-icon"><i data-lucide="calendar-days"></i></span>Hoy</div>
-</nav>
-
 <main class="content" id="main-content">
 
   <!-- MIS TAREAS -->
@@ -347,6 +340,26 @@ body{background:var(--bg-base);color:var(--text-1);font-family:-apple-system,Bli
     <div id="upcoming-list"></div>
   </div>
 </main>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <div class="bnav-item active" onclick="switchTab('tasks')" id="tab-tasks">
+    <i data-lucide="square-check-big"></i>
+    <span>Mis tareas</span>
+  </div>
+  <div class="bnav-item" onclick="switchTab('projects')" id="tab-projects">
+    <i data-lucide="folder"></i>
+    <span>Proyectos</span>
+  </div>
+  <div class="bnav-item" onclick="switchTab('today')" id="tab-today">
+    <i data-lucide="calendar-days"></i>
+    <span>Hoy</span>
+  </div>
+  <div class="bnav-item" onclick="openSummaryFromMenu()" id="tab-summary-nav">
+    <i data-lucide="bar-chart-3"></i>
+    <span>Resumen</span>
+  </div>
+</nav>
 
 <div class="fab-scrim" id="fab-scrim" onclick="closeFabMenus()"></div>
 
@@ -572,7 +585,7 @@ function updateGreeting() {
 ═══════════════════════════════════════ */
 function switchTab(tab) {
   currentTab = tab;
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.bnav-item').forEach(t=>t.classList.remove('active'));
   document.getElementById('tab-'+tab).classList.add('active');
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById('page-'+tab).classList.add('active');
@@ -629,10 +642,14 @@ function openSummaryFromMenu() {
   closeUserMenu();
   renderStats();
   document.getElementById('summary-page').classList.add('open');
+  document.querySelectorAll('.bnav-item').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-summary-nav').classList.add('active');
   callLucide();
 }
 function closeSummary() {
   document.getElementById('summary-page').classList.remove('open');
+  document.getElementById('tab-summary-nav').classList.remove('active');
+  document.getElementById('tab-'+currentTab).classList.add('active');
 }
 
 /* ═══════════════════════════════════════
