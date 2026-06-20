@@ -136,6 +136,42 @@ body{background:var(--bg-base);color:var(--text-1);font-family:-apple-system,Bli
 #proj-detail-page{position:fixed;inset:0;background:var(--bg-base);z-index:150;transform:translateX(100%);transition:transform .25s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column}
 #summary-page{position:fixed;inset:0;background:var(--bg-base);z-index:150;transform:translateX(100%);transition:transform .25s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column}
 #summary-page.open{transform:translateX(0)}
+#profile-page{position:fixed;inset:0;background:var(--bg-base);z-index:150;transform:translateX(100%);transition:transform .25s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column}
+#profile-page.open{transform:translateX(0)}
+
+/* PROFILE HERO */
+.profile-hero{display:flex;flex-direction:column;align-items:center;padding:24px 0 28px;text-align:center}
+.profile-avatar-wrap{position:relative;width:88px;height:88px;cursor:pointer;margin-bottom:14px}
+.profile-avatar{width:88px;height:88px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#a78bfa);display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:700;color:#fff;overflow:hidden;border:2px solid var(--border-2)}
+.profile-avatar img{width:100%;height:100%;object-fit:cover}
+.profile-avatar-edit{position:absolute;bottom:0;right:0;width:28px;height:28px;border-radius:50%;background:var(--accent);border:2px solid var(--bg-base);display:flex;align-items:center;justify-content:center;color:#fff}
+.profile-name-row{width:100%;max-width:260px}
+.profile-name-input{width:100%;background:none;border:none;outline:none;color:var(--text-1);font-size:19px;font-weight:700;text-align:center;padding:6px;border-bottom:1px solid transparent;transition:border-color .15s}
+.profile-name-input:focus{border-bottom-color:var(--accent)}
+.profile-name-hint{font-size:11px;color:var(--text-3);margin-top:2px}
+
+/* SETTINGS LIST */
+.settings-section-label{font-size:11px;font-weight:700;letter-spacing:1px;color:var(--text-3);text-transform:uppercase;margin:18px 0 8px;padding:0 2px}
+.settings-section-label:first-of-type{margin-top:0}
+.settings-group{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
+.settings-row{display:flex;align-items:center;gap:12px;padding:13px 14px;cursor:pointer;transition:background .15s;border-bottom:1px solid var(--border)}
+.settings-row:last-child{border-bottom:none}
+.settings-row:active{background:var(--bg-hover)}
+.settings-row-static{cursor:default}
+.settings-row-static:active{background:none}
+.settings-row-icon{width:32px;height:32px;border-radius:var(--radius-sm);background:var(--bg-input);color:var(--accent);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.settings-row-icon [data-lucide]{width:17px;height:17px}
+.settings-row-text{flex:1;min-width:0}
+.settings-row-title{font-size:14px;font-weight:500;color:var(--text-1)}
+.settings-row-sub{font-size:12px;color:var(--text-2);margin-top:1px}
+
+/* SWITCH (iOS-style toggle) */
+.switch{position:relative;display:inline-block;width:44px;height:26px;flex-shrink:0}
+.switch input{opacity:0;width:0;height:0}
+.switch-slider{position:absolute;cursor:pointer;inset:0;background:var(--border-2);border-radius:26px;transition:background .2s}
+.switch-slider::before{content:'';position:absolute;width:20px;height:20px;left:3px;top:3px;background:#fff;border-radius:50%;transition:transform .2s;box-shadow:0 1px 3px #00000044}
+.switch input:checked+.switch-slider{background:var(--accent)}
+.switch input:checked+.switch-slider::before{transform:translateX(18px)}
 
 /* USER MENU */
 .user-avatar-btn{font-size:18px;border-radius:50%}
@@ -289,23 +325,9 @@ body{background:var(--bg-base);color:var(--text-1);font-family:-apple-system,Bli
   </div>
   <div class="header-actions">
     <button class="icon-btn" onclick="toggleSearch()" title="Buscar"><i data-lucide="search" class="ico-md"></i></button>
-    <button class="icon-btn user-avatar-btn" onclick="toggleUserMenu()" title="Cuenta" id="user-avatar-btn"><i data-lucide="user" class="ico-md"></i></button>
+    <button class="icon-btn user-avatar-btn" onclick="openProfile()" title="Perfil" id="user-avatar-btn"><i data-lucide="user" class="ico-md"></i></button>
   </div>
 </header>
-
-<!-- USER MENU DROPDOWN -->
-<div class="user-menu-overlay" id="user-menu-overlay" onclick="closeUserMenu()">
-  <div class="user-menu" onclick="event.stopPropagation()">
-    <div class="user-menu-item" onclick="openSummaryFromMenu()">
-      <span class="umi-icon"><i data-lucide="bar-chart-3"></i></span>
-      <span>Resumen</span>
-    </div>
-    <div class="user-menu-item" onclick="requestNotifPermission();closeUserMenu()">
-      <span class="umi-icon"><i data-lucide="bell"></i></span>
-      <span>Notificaciones</span>
-    </div>
-  </div>
-</div>
 
 <main class="content" id="main-content">
 
@@ -381,6 +403,78 @@ body{background:var(--bg-base);color:var(--text-1);font-family:-apple-system,Bli
     <div class="stats-grid" id="stats-grid"></div>
     <div style="font-size:11px;font-weight:700;letter-spacing:1px;color:var(--text-3);text-transform:uppercase;margin-bottom:10px">Por proyecto</div>
     <div id="proj-stats"></div>
+  </div>
+</div>
+
+<!-- ── PROFILE PAGE ──────────────────────────── -->
+<div id="profile-page">
+  <div class="proj-detail-header">
+    <button class="back-btn" onclick="closeProfile()"><i data-lucide="chevron-left"></i> Volver</button>
+    <div class="proj-detail-title" style="display:flex;align-items:center;gap:8px"><i data-lucide="user" class="ico-md"></i> Perfil</div>
+  </div>
+  <div class="proj-detail-content">
+
+    <!-- AVATAR + NAME -->
+    <div class="profile-hero">
+      <div class="profile-avatar-wrap" onclick="document.getElementById('avatar-input').click()">
+        <div class="profile-avatar" id="profile-avatar-display"></div>
+        <div class="profile-avatar-edit"><i data-lucide="camera" class="ico-sm"></i></div>
+      </div>
+      <input type="file" id="avatar-input" accept="image/*" class="hidden" onchange="handleAvatarUpload(event)">
+      <div class="profile-name-row">
+        <input type="text" id="profile-name-input" class="profile-name-input" placeholder="Tu nombre" oninput="saveProfileName()" maxlength="40">
+      </div>
+      <div class="profile-name-hint">Toca la foto para cambiarla</div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="settings-section-label">Preferencias</div>
+    <div class="settings-group">
+      <div class="settings-row">
+        <span class="settings-row-icon"><i data-lucide="bell"></i></span>
+        <div class="settings-row-text">
+          <div class="settings-row-title">Notificaciones</div>
+          <div class="settings-row-sub" id="notif-status-sub">Avisos de tareas próximas a vencer</div>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="notif-toggle" onchange="onNotifToggle(this)">
+          <span class="switch-slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="settings-section-label">Datos</div>
+    <div class="settings-group">
+      <div class="settings-row" onclick="exportData()">
+        <span class="settings-row-icon"><i data-lucide="download"></i></span>
+        <div class="settings-row-text">
+          <div class="settings-row-title">Exportar datos</div>
+          <div class="settings-row-sub">Descarga un respaldo en archivo .json</div>
+        </div>
+        <i data-lucide="chevron-right" class="ico-md" style="color:var(--text-3)"></i>
+      </div>
+      <div class="settings-row" onclick="document.getElementById('import-input').click()">
+        <span class="settings-row-icon"><i data-lucide="upload"></i></span>
+        <div class="settings-row-text">
+          <div class="settings-row-title">Importar datos</div>
+          <div class="settings-row-sub">Restaura desde un archivo .json</div>
+        </div>
+        <i data-lucide="chevron-right" class="ico-md" style="color:var(--text-3)"></i>
+      </div>
+      <input type="file" id="import-input" accept="application/json" class="hidden" onchange="handleImportFile(event)">
+    </div>
+
+    <div class="settings-section-label">Acerca de</div>
+    <div class="settings-group">
+      <div class="settings-row settings-row-static">
+        <span class="settings-row-icon"><i data-lucide="info"></i></span>
+        <div class="settings-row-text">
+          <div class="settings-row-title">TaskFlow</div>
+          <div class="settings-row-sub">Versión 1.0.0 · Hecho para uso offline</div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -512,11 +606,17 @@ let tasks    = JSON.parse(localStorage.getItem('tf2_tasks')    || '[]');
 let projects = JSON.parse(localStorage.getItem('tf2_projects') || '[]');
 // sections: { id, name, projectId (null = "Mis tareas"), order }
 let sections = JSON.parse(localStorage.getItem('tf2_sections') || '[]');
+// profile: { name, avatarDataUrl }
+let profile  = JSON.parse(localStorage.getItem('tf2_profile')  || 'null') || { name: '', avatarDataUrl: '' };
 
 const save = () => {
   localStorage.setItem('tf2_tasks',    JSON.stringify(tasks));
   localStorage.setItem('tf2_projects', JSON.stringify(projects));
   localStorage.setItem('tf2_sections', JSON.stringify(sections));
+};
+
+const saveProfile = () => {
+  localStorage.setItem('tf2_profile', JSON.stringify(profile));
 };
 
 /* Default section for "Mis tareas" */
@@ -571,6 +671,7 @@ function init() {
   updateGreeting();
   buildEmojiPicker();
   buildColorPicker();
+  updateHeaderAvatar();
   render();
   scheduleNotifications();
 }
@@ -630,16 +731,9 @@ function fabAction(type, projId) {
 }
 
 /* ═══════════════════════════════════════
-   USER MENU
+   SUMMARY (accessed via bottom nav)
 ═══════════════════════════════════════ */
-function toggleUserMenu() {
-  document.getElementById('user-menu-overlay').classList.toggle('open');
-}
-function closeUserMenu() {
-  document.getElementById('user-menu-overlay').classList.remove('open');
-}
 function openSummaryFromMenu() {
-  closeUserMenu();
   renderStats();
   document.getElementById('summary-page').classList.add('open');
   document.querySelectorAll('.bnav-item').forEach(t=>t.classList.remove('active'));
@@ -650,6 +744,171 @@ function closeSummary() {
   document.getElementById('summary-page').classList.remove('open');
   document.getElementById('tab-summary-nav').classList.remove('active');
   document.getElementById('tab-'+currentTab).classList.add('active');
+}
+
+/* ═══════════════════════════════════════
+   PROFILE PAGE
+═══════════════════════════════════════ */
+function openProfile() {
+  renderProfileHero();
+  const notifOn = ('Notification' in window) && Notification.permission === 'granted';
+  document.getElementById('notif-toggle').checked = notifOn;
+  updateNotifStatusSub();
+  document.getElementById('profile-page').classList.add('open');
+  callLucide();
+}
+
+function closeProfile() {
+  document.getElementById('profile-page').classList.remove('open');
+}
+
+function renderProfileHero() {
+  document.getElementById('profile-name-input').value = profile.name || '';
+  const avatarEl = document.getElementById('profile-avatar-display');
+  if (profile.avatarDataUrl) {
+    avatarEl.innerHTML = `<img src="${profile.avatarDataUrl}" alt="Foto de perfil">`;
+  } else {
+    const initials = getInitials(profile.name);
+    avatarEl.innerHTML = initials
+      ? esc(initials)
+      : '<i data-lucide="user" class="ico-lg"></i>';
+  }
+  callLucide();
+  updateHeaderAvatar();
+}
+
+function getInitials(name) {
+  const trimmed = (name || '').trim();
+  if (!trimmed) return '';
+  const parts = trimmed.split(/\s+/).slice(0, 2);
+  return parts.map(p => p[0].toUpperCase()).join('');
+}
+
+function saveProfileName() {
+  profile.name = document.getElementById('profile-name-input').value;
+  saveProfile();
+  const avatarEl = document.getElementById('profile-avatar-display');
+  if (!profile.avatarDataUrl) {
+    const initials = getInitials(profile.name);
+    avatarEl.innerHTML = initials ? esc(initials) : '<i data-lucide="user" class="ico-lg"></i>';
+    callLucide();
+  }
+  updateHeaderAvatar();
+}
+
+function handleAvatarUpload(ev) {
+  const file = ev.target.files && ev.target.files[0];
+  if (!file) return;
+  if (!file.type.startsWith('image/')) { showToast('⚠ Selecciona una imagen válida'); return; }
+  if (file.size > 3 * 1024 * 1024) { showToast('⚠ Imagen muy pesada (máx. 3MB)'); return; }
+  const reader = new FileReader();
+  reader.onload = () => {
+    profile.avatarDataUrl = reader.result;
+    saveProfile();
+    renderProfileHero();
+    showToast('📷 Foto actualizada');
+  };
+  reader.onerror = () => showToast('⚠ No se pudo leer la imagen');
+  reader.readAsDataURL(file);
+}
+
+function updateHeaderAvatar() {
+  const btn = document.getElementById('user-avatar-btn');
+  if (!btn) return;
+  if (profile.avatarDataUrl) {
+    btn.innerHTML = `<img src="${profile.avatarDataUrl}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
+  } else {
+    const initials = getInitials(profile.name);
+    btn.innerHTML = initials
+      ? `<span style="font-size:13px;font-weight:700">${esc(initials)}</span>`
+      : '<i data-lucide="user" class="ico-md"></i>';
+    callLucide();
+  }
+}
+
+function updateNotifStatusSub() {
+  const sub = document.getElementById('notif-status-sub');
+  if (!('Notification' in window)) {
+    sub.textContent = 'No disponible en este navegador';
+  } else if (Notification.permission === 'denied') {
+    sub.textContent = 'Bloqueadas — actívalas desde los ajustes del navegador';
+  } else {
+    sub.textContent = 'Avisos de tareas próximas a vencer';
+  }
+}
+
+async function onNotifToggle(checkbox) {
+  if (checkbox.checked) {
+    if (!('Notification' in window)) {
+      showToast('⚠ No disponible en este navegador');
+      checkbox.checked = false;
+      return;
+    }
+    const perm = await Notification.requestPermission();
+    if (perm === 'granted') {
+      showToast('🔔 Notificaciones activadas');
+      scheduleNotifications();
+    } else {
+      showToast('🔕 Permiso denegado');
+      checkbox.checked = false;
+    }
+  } else {
+    // Browsers don't allow revoking permission programmatically;
+    // we simply stop scheduling new notifications.
+    showToast('🔕 No se programarán nuevos avisos');
+  }
+  updateNotifStatusSub();
+}
+
+function exportData() {
+  const payload = {
+    exportedAt: new Date().toISOString(),
+    app: 'TaskFlow',
+    version: 1,
+    profile, tasks, projects, sections,
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const dateStr = new Date().toISOString().slice(0,10);
+  a.href = url;
+  a.download = `taskflow-backup-${dateStr}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+  showToast('⬇ Datos exportados');
+}
+
+function handleImportFile(ev) {
+  const file = ev.target.files && ev.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const data = JSON.parse(reader.result);
+      if (!data || !Array.isArray(data.tasks) || !Array.isArray(data.projects)) {
+        showToast('⚠ Archivo inválido');
+        return;
+      }
+      tasks    = data.tasks;
+      projects = data.projects;
+      sections = Array.isArray(data.sections) ? data.sections : [];
+      save();
+      if (data.profile && typeof data.profile === 'object') {
+        profile = { name: data.profile.name || '', avatarDataUrl: data.profile.avatarDataUrl || '' };
+        saveProfile();
+        renderProfileHero();
+      }
+      showToast('⬆ Datos importados correctamente');
+      render();
+    } catch (e) {
+      showToast('⚠ No se pudo leer el archivo');
+    }
+  };
+  reader.onerror = () => showToast('⚠ No se pudo leer el archivo');
+  reader.readAsText(file);
+  ev.target.value = '';
 }
 
 /* ═══════════════════════════════════════
@@ -1321,11 +1580,6 @@ function closeSheet(id){document.getElementById(id).classList.remove('open');}
 /* ═══════════════════════════════════════
    NOTIFICATIONS
 ═══════════════════════════════════════ */
-async function requestNotifPermission(){
-  if(!('Notification'in window)){showToast('⚠ No disponible');return;}
-  const p=await Notification.requestPermission();
-  p==='granted'?(showToast('🔔 Notificaciones activadas'),scheduleNotifications()):showToast('🔕 Permiso denegado');
-}
 function scheduleNotifications(){
   if(!('Notification' in window) || Notification.permission!=='granted') return;
   const now=new Date();
