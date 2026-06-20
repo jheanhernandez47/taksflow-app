@@ -54,6 +54,10 @@ body{background:var(--bg-base);color:var(--text-1);font-family:-apple-system,Bli
 .bottom-nav{position:fixed;bottom:0;left:0;right:0;display:flex;background:var(--bg-surface);border-top:1px solid var(--border);flex-shrink:0;z-index:120;padding-bottom:env(safe-area-inset-bottom,0)}
 .bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:9px 4px 8px;color:var(--text-3);cursor:pointer;transition:color .15s;font-size:10.5px;font-weight:500}
 .bnav-item [data-lucide]{width:21px;height:21px}
+.bnav-icon-slot{display:flex;align-items:center;justify-content:center;width:21px;height:21px}
+.bnav-icon-slot img{width:21px;height:21px;border-radius:50%;object-fit:cover;border:1.5px solid currentColor}
+.bnav-icon-slot .bnav-initials{width:21px;height:21px;border-radius:50%;background:var(--accent-dim);color:var(--accent);font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.bnav-item.active .bnav-icon-slot .bnav-initials{background:var(--accent);color:#fff}
 .bnav-item.active{color:var(--accent)}
 
 /* CONTENT */
@@ -74,11 +78,6 @@ body{background:var(--bg-base);color:var(--text-1);font-family:-apple-system,Bli
 .fmi-icon [data-lucide]{width:15px;height:15px}
 .fab-scrim{position:fixed;inset:0;z-index:99;background:#00000000;opacity:0;pointer-events:none;transition:opacity .18s}
 .fab-scrim.open{opacity:1;pointer-events:all;background:#00000044}
-
-/* SEARCH */
-.search-bar{display:flex;align-items:center;gap:8px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:0 12px;height:40px;margin-bottom:14px}
-.search-bar input{flex:1;background:none;border:none;outline:none;color:var(--text-1);font-size:14px}
-.search-bar input::placeholder{color:var(--text-3)}
 
 /* FILTER CHIPS */
 .chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-bottom:14px;padding-bottom:2px}
@@ -138,6 +137,26 @@ body{background:var(--bg-base);color:var(--text-1);font-family:-apple-system,Bli
 #summary-page.open{transform:translateX(0)}
 #profile-page{position:fixed;inset:0;background:var(--bg-base);z-index:150;transform:translateX(100%);transition:transform .25s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column}
 #profile-page.open{transform:translateX(0)}
+#search-page{position:fixed;inset:0;background:var(--bg-base);z-index:150;transform:translateX(100%);transition:transform .25s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column}
+#search-page.open{transform:translateX(0)}
+.search-bar-standalone{display:flex;align-items:center;gap:8px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:0 12px;height:42px}
+.search-bar-standalone input{flex:1;background:none;border:none;outline:none;color:var(--text-1);font-size:14px;min-width:0}
+.search-bar-standalone input::placeholder{color:var(--text-3)}
+.search-clear-btn{background:none;border:none;color:var(--text-3);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:2px;flex-shrink:0}
+.search-empty-hint{text-align:center;padding:48px 24px;color:var(--text-3)}
+.search-result-section-label{font-size:11px;font-weight:700;letter-spacing:1px;color:var(--text-3);text-transform:uppercase;margin:16px 0 8px}
+.search-result-section-label:first-child{margin-top:0}
+
+/* INICIO */
+.home-section-label{font-size:11px;font-weight:700;letter-spacing:1px;color:var(--text-3);text-transform:uppercase;margin:20px 0 8px}
+.home-section-label:first-child{margin-top:0}
+.home-recent-proj-scroll{display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.home-recent-proj-scroll::-webkit-scrollbar{display:none}
+.home-proj-card{flex-shrink:0;width:128px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:12px;cursor:pointer;transition:all .15s}
+.home-proj-card:active{background:var(--bg-hover);transform:scale(.97)}
+.home-proj-card-icon{width:34px;height:34px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:8px}
+.home-proj-card-name{font-size:13px;font-weight:600;color:var(--text-1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.home-proj-card-sub{font-size:11px;color:var(--text-3);margin-top:2px}
 
 /* PROFILE HERO */
 .profile-hero{display:flex;flex-direction:column;align-items:center;padding:24px 0 28px;text-align:center}
@@ -145,9 +164,12 @@ body{background:var(--bg-base);color:var(--text-1);font-family:-apple-system,Bli
 .profile-avatar{width:88px;height:88px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#a78bfa);display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:700;color:#fff;overflow:hidden;border:2px solid var(--border-2)}
 .profile-avatar img{width:100%;height:100%;object-fit:cover}
 .profile-avatar-edit{position:absolute;bottom:0;right:0;width:28px;height:28px;border-radius:50%;background:var(--accent);border:2px solid var(--bg-base);display:flex;align-items:center;justify-content:center;color:#fff}
-.profile-name-row{width:100%;max-width:260px}
-.profile-name-input{width:100%;background:none;border:none;outline:none;color:var(--text-1);font-size:19px;font-weight:700;text-align:center;padding:6px;border-bottom:1px solid transparent;transition:border-color .15s}
-.profile-name-input:focus{border-bottom-color:var(--accent)}
+.profile-name-row{width:100%;max-width:280px;display:flex;align-items:center;justify-content:center;gap:6px}
+.profile-name-input{flex:1;min-width:0;background:none;border:none;outline:none;color:var(--text-1);font-size:19px;font-weight:700;text-align:center;padding:6px;border-bottom:1px solid transparent;transition:border-color .15s;cursor:default}
+.profile-name-input.editing{border-bottom-color:var(--accent);cursor:text}
+.profile-name-edit-btn{background:var(--bg-card);border:1px solid var(--border);color:var(--text-2);width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:all .15s}
+.profile-name-edit-btn:active{background:var(--bg-hover);transform:scale(.94)}
+.profile-name-edit-btn.editing{background:var(--accent);border-color:var(--accent);color:#fff}
 .profile-name-hint{font-size:11px;color:var(--text-3);margin-top:2px}
 
 /* SETTINGS LIST */
@@ -174,7 +196,6 @@ body{background:var(--bg-base);color:var(--text-1);font-family:-apple-system,Bli
 .switch input:checked+.switch-slider::before{transform:translateX(18px)}
 
 /* USER MENU */
-.user-avatar-btn{font-size:18px;border-radius:50%}
 .user-menu-overlay{position:fixed;inset:0;z-index:250;background:transparent;opacity:0;pointer-events:none;transition:opacity .15s}
 .user-menu-overlay.open{opacity:1;pointer-events:all}
 .user-menu{position:absolute;top:60px;right:16px;background:var(--bg-surface);border:1px solid var(--border-2);border-radius:var(--radius-md);box-shadow:0 8px 28px #00000077;min-width:200px;padding:6px;transform:translateY(-8px);opacity:0;transition:all .18s}
@@ -323,20 +344,24 @@ body{background:var(--bg-base);color:var(--text-1);font-family:-apple-system,Bli
     <div class="header-title">TaskFlow</div>
     <div class="header-sub" id="header-sub">Buenos días</div>
   </div>
-  <div class="header-actions">
-    <button class="icon-btn" onclick="toggleSearch()" title="Buscar"><i data-lucide="search" class="ico-md"></i></button>
-    <button class="icon-btn user-avatar-btn" onclick="openProfile()" title="Perfil" id="user-avatar-btn"><i data-lucide="user" class="ico-md"></i></button>
-  </div>
 </header>
 
 <main class="content" id="main-content">
 
+  <!-- INICIO -->
+  <div id="page-home" class="page active">
+    <div class="home-section-label">Próximas a vencer</div>
+    <div id="home-upcoming-list"></div>
+
+    <div class="home-section-label">Proyectos recientes</div>
+    <div id="home-recent-projects"></div>
+
+    <div class="home-section-label">Tareas añadidas recientemente</div>
+    <div id="home-recent-tasks"></div>
+  </div>
+
   <!-- MIS TAREAS -->
-  <div id="page-tasks" class="page active">
-    <div class="search-bar hidden" id="search-bar">
-      <span style="color:var(--text-3);display:flex"><i data-lucide="search" class="ico-md"></i></span>
-      <input type="text" id="search-input" placeholder="Buscar tareas..." oninput="renderMyTasks()">
-    </div>
+  <div id="page-tasks" class="page">
     <div class="chips" id="filter-chips">
       <div class="chip active" onclick="setFilter('all',this)">Todas</div>
       <div class="chip" onclick="setFilter('pending',this)">Pendientes</div>
@@ -354,18 +379,15 @@ body{background:var(--bg-base);color:var(--text-1);font-family:-apple-system,Bli
     </div>
   </div>
 
-  <!-- HOY -->
-  <div id="page-today" class="page">
-    <div style="font-size:11px;font-weight:700;letter-spacing:1px;color:var(--text-3);text-transform:uppercase;margin-bottom:8px">Tareas para hoy</div>
-    <div id="today-list"></div>
-    <div style="font-size:11px;font-weight:700;letter-spacing:1px;color:var(--text-3);text-transform:uppercase;margin:18px 0 8px">Próximas (7 días)</div>
-    <div id="upcoming-list"></div>
-  </div>
 </main>
 
 <!-- BOTTOM NAV -->
 <nav class="bottom-nav">
-  <div class="bnav-item active" onclick="switchTab('tasks')" id="tab-tasks">
+  <div class="bnav-item active" onclick="switchTab('home')" id="tab-home">
+    <i data-lucide="home"></i>
+    <span>Inicio</span>
+  </div>
+  <div class="bnav-item" onclick="switchTab('tasks')" id="tab-tasks">
     <i data-lucide="square-check-big"></i>
     <span>Mis tareas</span>
   </div>
@@ -373,13 +395,13 @@ body{background:var(--bg-base);color:var(--text-1);font-family:-apple-system,Bli
     <i data-lucide="folder"></i>
     <span>Proyectos</span>
   </div>
-  <div class="bnav-item" onclick="switchTab('today')" id="tab-today">
-    <i data-lucide="calendar-days"></i>
-    <span>Hoy</span>
+  <div class="bnav-item" onclick="openSearchPanel()" id="tab-search">
+    <i data-lucide="search"></i>
+    <span>Buscar</span>
   </div>
-  <div class="bnav-item" onclick="openSummaryFromMenu()" id="tab-summary-nav">
-    <i data-lucide="bar-chart-3"></i>
-    <span>Resumen</span>
+  <div class="bnav-item" onclick="openProfile()" id="tab-profile">
+    <span class="bnav-icon-slot" id="bnav-profile-icon"><i data-lucide="user"></i></span>
+    <span>Perfil</span>
   </div>
 </nav>
 
@@ -406,6 +428,25 @@ body{background:var(--bg-base);color:var(--text-1);font-family:-apple-system,Bli
   </div>
 </div>
 
+<!-- ── SEARCH PANEL ──────────────────────────── -->
+<div id="search-page">
+  <div class="proj-detail-header">
+    <button class="back-btn" onclick="closeSearchPanel()"><i data-lucide="chevron-left"></i> Volver</button>
+  </div>
+  <div style="padding:12px 14px 0">
+    <div class="search-bar-standalone">
+      <i data-lucide="search" class="ico-md" style="color:var(--text-3);flex-shrink:0"></i>
+      <input type="text" id="global-search-input" placeholder="Buscar tareas o proyectos..." oninput="renderSearchResults()" autocomplete="off">
+      <button type="button" id="search-clear-btn" class="search-clear-btn hidden" onclick="clearSearchInput()"><i data-lucide="x" class="ico-sm"></i></button>
+    </div>
+    <div class="chips" style="margin-top:12px">
+      <div class="chip active" onclick="setSearchScope('tasks',this)">Tareas</div>
+      <div class="chip" onclick="setSearchScope('projects',this)">Proyectos</div>
+    </div>
+  </div>
+  <div class="proj-detail-content" id="search-results"></div>
+</div>
+
 <!-- ── PROFILE PAGE ──────────────────────────── -->
 <div id="profile-page">
   <div class="proj-detail-header">
@@ -422,12 +463,26 @@ body{background:var(--bg-base);color:var(--text-1);font-family:-apple-system,Bli
       </div>
       <input type="file" id="avatar-input" accept="image/*" class="hidden" onchange="handleAvatarUpload(event)">
       <div class="profile-name-row">
-        <input type="text" id="profile-name-input" class="profile-name-input" placeholder="Tu nombre" oninput="saveProfileName()" maxlength="40">
+        <input type="text" id="profile-name-input" class="profile-name-input" placeholder="Tu nombre" oninput="saveProfileName()" onblur="exitNameEdit()" onkeydown="if(event.key==='Enter')this.blur()" maxlength="40" readonly>
+        <button type="button" class="profile-name-edit-btn" id="profile-name-edit-btn" onmousedown="event.preventDefault()" onclick="toggleNameEdit()" title="Editar nombre"><i data-lucide="pencil" class="ico-sm"></i></button>
       </div>
       <div class="profile-name-hint">Toca la foto para cambiarla</div>
     </div>
 
     <!-- SETTINGS -->
+    <!-- SUMMARY -->
+    <div class="settings-section-label">Estadísticas</div>
+    <div class="settings-group">
+      <div class="settings-row" onclick="openSummaryFromMenu()">
+        <span class="settings-row-icon"><i data-lucide="bar-chart-3"></i></span>
+        <div class="settings-row-text">
+          <div class="settings-row-title">Resumen</div>
+          <div class="settings-row-sub">Estadísticas de tareas y proyectos</div>
+        </div>
+        <i data-lucide="chevron-right" class="ico-md" style="color:var(--text-3)"></i>
+      </div>
+    </div>
+
     <div class="settings-section-label">Preferencias</div>
     <div class="settings-group">
       <div class="settings-row">
@@ -619,6 +674,25 @@ const saveProfile = () => {
   localStorage.setItem('tf2_profile', JSON.stringify(profile));
 };
 
+// recentProjectViews: { [projectId]: timestamp }
+let recentProjectViews = JSON.parse(localStorage.getItem('tf2_recent_projects') || '{}');
+
+function trackProjectView(projId) {
+  recentProjectViews[projId] = Date.now();
+  // Keep only the last 20 to avoid unbounded growth
+  const entries = Object.entries(recentProjectViews).sort((a,b)=>b[1]-a[1]).slice(0,20);
+  recentProjectViews = Object.fromEntries(entries);
+  localStorage.setItem('tf2_recent_projects', JSON.stringify(recentProjectViews));
+}
+
+function getRecentProjects(limit) {
+  return Object.entries(recentProjectViews)
+    .sort((a,b)=>b[1]-a[1])
+    .map(([id]) => projects.find(p=>p.id===id))
+    .filter(Boolean)
+    .slice(0, limit || 5);
+}
+
 /* Default section for "Mis tareas" */
 const MY_TASKS_DEFAULT_SECTION = '__recent__';
 
@@ -648,7 +722,7 @@ if (!tasks.length) {
 /* ═══════════════════════════════════════
    STATE
 ═══════════════════════════════════════ */
-let currentTab       = 'tasks';
+let currentTab       = 'home';
 let activeFilter     = 'all';
 let editingTaskId    = null;
 let formSubtasks     = [];
@@ -695,9 +769,9 @@ function switchTab(tab) {
 }
 
 function render() {
+  if(currentTab==='home')     renderHome();
   if(currentTab==='tasks')    renderMyTasks();
   if(currentTab==='projects') renderProjects();
-  if(currentTab==='today')    renderToday();
   callLucide();
 }
 
@@ -731,19 +805,95 @@ function fabAction(type, projId) {
 }
 
 /* ═══════════════════════════════════════
-   SUMMARY (accessed via bottom nav)
+   SUMMARY (accessed from Profile screen)
 ═══════════════════════════════════════ */
 function openSummaryFromMenu() {
   renderStats();
   document.getElementById('summary-page').classList.add('open');
-  document.querySelectorAll('.bnav-item').forEach(t=>t.classList.remove('active'));
-  document.getElementById('tab-summary-nav').classList.add('active');
   callLucide();
 }
 function closeSummary() {
   document.getElementById('summary-page').classList.remove('open');
-  document.getElementById('tab-summary-nav').classList.remove('active');
-  document.getElementById('tab-'+currentTab).classList.add('active');
+}
+
+/* ═══════════════════════════════════════
+   SEARCH PANEL (standalone, accessed from
+   bottom nav — searches tasks or projects)
+═══════════════════════════════════════ */
+let searchScope = 'tasks';
+
+function openSearchPanel() {
+  document.getElementById('search-page').classList.add('open');
+  renderSearchResults();
+  callLucide();
+  setTimeout(() => document.getElementById('global-search-input').focus(), 280);
+}
+
+function closeSearchPanel() {
+  document.getElementById('search-page').classList.remove('open');
+}
+
+function setSearchScope(scope, el) {
+  searchScope = scope;
+  document.querySelectorAll('#search-page .chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  const input = document.getElementById('global-search-input');
+  input.placeholder = scope === 'tasks' ? 'Buscar tareas...' : 'Buscar proyectos...';
+  renderSearchResults();
+}
+
+function clearSearchInput() {
+  const input = document.getElementById('global-search-input');
+  input.value = '';
+  input.focus();
+  renderSearchResults();
+}
+
+function renderSearchResults() {
+  const input = document.getElementById('global-search-input');
+  const q = input.value.trim().toLowerCase();
+  document.getElementById('search-clear-btn').classList.toggle('hidden', !q);
+
+  const container = document.getElementById('search-results');
+
+  if (!q) {
+    container.innerHTML = `<div class="search-empty-hint"><div class="empty-icon"><i data-lucide="search"></i></div><div class="empty-msg">Escribe para buscar ${searchScope==='tasks'?'tareas':'proyectos'}</div></div>`;
+    callLucide();
+    return;
+  }
+
+  if (searchScope === 'tasks') {
+    const matches = tasks.filter(t =>
+      t.title.toLowerCase().includes(q) || (t.desc||'').toLowerCase().includes(q)
+    );
+    if (!matches.length) {
+      container.innerHTML = `<div class="search-empty-hint"><div class="empty-icon"><i data-lucide="search-x"></i></div><div class="empty-msg">Sin resultados para "${esc(input.value.trim())}"</div></div>`;
+    } else {
+      const pending = matches.filter(t=>!t.done);
+      const done = matches.filter(t=>t.done);
+      let html = '';
+      if (pending.length) html += `<div class="search-result-section-label">Pendientes</div>` + pending.map(t=>taskCardHTML(t)).join('');
+      if (done.length) html += `<div class="search-result-section-label">Completadas</div>` + done.map(t=>taskCardHTML(t)).join('');
+      container.innerHTML = html;
+    }
+  } else {
+    const matches = projects.filter(p => p.name.toLowerCase().includes(q));
+    if (!matches.length) {
+      container.innerHTML = `<div class="search-empty-hint"><div class="empty-icon"><i data-lucide="search-x"></i></div><div class="empty-msg">Sin resultados para "${esc(input.value.trim())}"</div></div>`;
+    } else {
+      container.innerHTML = matches.map(p=>{
+        const pts = tasks.filter(t=>t.project===p.id);
+        const done = pts.filter(t=>t.done).length;
+        return `<div class="proj-list-item" onclick="closeSearchPanel();openProjectDetail('${p.id}')">
+          <div class="proj-dot" style="background:${p.color}"></div>
+          <span class="proj-list-name">${p.icon} ${esc(p.name)}</span>
+          <span class="proj-list-count">${pts.length-done} pendientes</span>
+          <span style="color:var(--text-3);display:flex"><i data-lucide="chevron-right" class="ico-md"></i></span>
+        </div>`;
+      }).join('');
+    }
+  }
+  callLucide();
 }
 
 /* ═══════════════════════════════════════
@@ -796,6 +946,38 @@ function saveProfileName() {
   updateHeaderAvatar();
 }
 
+function enterNameEdit() {
+  const input = document.getElementById('profile-name-input');
+  const btn = document.getElementById('profile-name-edit-btn');
+  input.readOnly = false;
+  input.classList.add('editing');
+  btn.classList.add('editing');
+  btn.innerHTML = '<i data-lucide="check" class="ico-sm"></i>';
+  callLucide();
+  input.focus();
+  input.setSelectionRange(input.value.length, input.value.length);
+}
+
+function exitNameEdit() {
+  const input = document.getElementById('profile-name-input');
+  const btn = document.getElementById('profile-name-edit-btn');
+  input.readOnly = true;
+  input.classList.remove('editing');
+  btn.classList.remove('editing');
+  btn.innerHTML = '<i data-lucide="pencil" class="ico-sm"></i>';
+  callLucide();
+}
+
+function toggleNameEdit() {
+  const input = document.getElementById('profile-name-input');
+  if (input.readOnly) {
+    enterNameEdit();
+  } else {
+    exitNameEdit();
+    input.blur();
+  }
+}
+
 function handleAvatarUpload(ev) {
   const file = ev.target.files && ev.target.files[0];
   if (!file) return;
@@ -813,15 +995,15 @@ function handleAvatarUpload(ev) {
 }
 
 function updateHeaderAvatar() {
-  const btn = document.getElementById('user-avatar-btn');
-  if (!btn) return;
+  const slot = document.getElementById('bnav-profile-icon');
+  if (!slot) return;
   if (profile.avatarDataUrl) {
-    btn.innerHTML = `<img src="${profile.avatarDataUrl}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
+    slot.innerHTML = `<img src="${profile.avatarDataUrl}" alt="">`;
   } else {
     const initials = getInitials(profile.name);
-    btn.innerHTML = initials
-      ? `<span style="font-size:13px;font-weight:700">${esc(initials)}</span>`
-      : '<i data-lucide="user" class="ico-md"></i>';
+    slot.innerHTML = initials
+      ? `<span class="bnav-initials">${esc(initials)}</span>`
+      : '<i data-lucide="user"></i>';
     callLucide();
   }
 }
@@ -922,9 +1104,7 @@ function setFilter(f,el) {
 }
 
 function applyFilter(list) {
-  const q=(document.getElementById('search-input')?.value||'').toLowerCase();
   return list.filter(t=>{
-    if(q&&!t.title.toLowerCase().includes(q)&&!(t.desc||'').toLowerCase().includes(q)) return false;
     if(activeFilter==='pending') return !t.done;
     if(activeFilter==='done')    return  t.done;
     return true;
@@ -1016,6 +1196,8 @@ function openProjectDetail(projId) {
   currentProjView  = 'list';
   const proj = projects.find(p=>p.id===projId);
   if(!proj) return;
+
+  trackProjectView(projId);
 
   // Header
   document.getElementById('pd-title').textContent = proj.icon+' '+proj.name;
@@ -1280,13 +1462,39 @@ function taskCardHTML(t) {
 /* ═══════════════════════════════════════
    TODAY
 ═══════════════════════════════════════ */
-function renderToday() {
-  const now=new Date(); const todayEnd=new Date(now); todayEnd.setHours(23,59,59,999);
-  const in7=new Date(now); in7.setDate(in7.getDate()+7);
-  const tl=tasks.filter(t=>!t.done&&t.due&&new Date(t.due)<=todayEnd);
-  const ul=tasks.filter(t=>!t.done&&t.due&&new Date(t.due)>todayEnd&&new Date(t.due)<=in7);
-  document.getElementById('today-list').innerHTML=tl.length?tl.map(t=>taskCardHTML(t)).join(''):`<div class="empty" style="padding:16px 0"><div class="empty-msg">Sin tareas para hoy 🎉</div></div>`;
-  document.getElementById('upcoming-list').innerHTML=ul.length?ul.map(t=>taskCardHTML(t)).join(''):`<div class="empty" style="padding:16px 0"><div class="empty-msg">Sin tareas próximas</div></div>`;
+function renderHome() {
+  // 1. Próximas a vencer — soonest-due pending tasks first, across all tasks
+  const upcoming = tasks
+    .filter(t => !t.done && t.due)
+    .sort((a,b) => new Date(a.due) - new Date(b.due))
+    .slice(0, 6);
+  document.getElementById('home-upcoming-list').innerHTML = upcoming.length
+    ? upcoming.map(t=>taskCardHTML(t)).join('')
+    : `<div class="empty" style="padding:16px 0"><div class="empty-msg">Sin tareas próximas a vencer 🎉</div></div>`;
+
+  // 2. Proyectos vistos recientemente
+  const recentProjs = getRecentProjects(6);
+  const recentProjsEl = document.getElementById('home-recent-projects');
+  if (!recentProjs.length) {
+    recentProjsEl.innerHTML = `<div class="empty" style="padding:16px 0"><div class="empty-msg">Aún no has abierto ningún proyecto</div></div>`;
+  } else {
+    recentProjsEl.innerHTML = `<div class="home-recent-proj-scroll">${recentProjs.map(p=>{
+      const pts = tasks.filter(t=>t.project===p.id);
+      const done = pts.filter(t=>t.done).length;
+      return `<div class="home-proj-card" onclick="openProjectDetail('${p.id}')">
+        <div class="home-proj-card-icon" style="background:${p.color}22">${p.icon}</div>
+        <div class="home-proj-card-name">${esc(p.name)}</div>
+        <div class="home-proj-card-sub">${pts.length-done} pendientes</div>
+      </div>`;
+    }).join('')}</div>`;
+  }
+
+  // 3. Tareas añadidas recientemente
+  const recentTasks = [...tasks].sort((a,b)=>b.created-a.created).slice(0, 6);
+  document.getElementById('home-recent-tasks').innerHTML = recentTasks.length
+    ? recentTasks.map(t=>taskCardHTML(t)).join('')
+    : `<div class="empty" style="padding:16px 0"><div class="empty-msg">Aún no has creado tareas</div></div>`;
+
   callLucide();
 }
 
@@ -1513,6 +1721,8 @@ function deleteProject() {
   tasks=tasks.filter(t=>t.project!==editingProjId);
   sections=sections.filter(s=>s.projectId!==editingProjId);
   projects=projects.filter(p=>p.id!==editingProjId);
+  delete recentProjectViews[editingProjId];
+  localStorage.setItem('tf2_recent_projects', JSON.stringify(recentProjectViews));
   save(); closeSheet('proj-overlay'); closeProjectDetail();
   showToast('🗑 Proyecto eliminado');
 }
@@ -1547,15 +1757,6 @@ function addSubtask() {
 }
 function removeFormSubtask(id){formSubtasks=formSubtasks.filter(s=>s.id!==id);renderFormSubtasks();}
 function renderFormSubtasks(){document.getElementById('subtask-list').innerHTML=formSubtasks.map(s=>`<div class="subtask-item"><span>${esc(s.title)}</span><span class="rm" onclick="removeFormSubtask('${s.id}')"><i data-lucide="x" class="ico-sm"></i></span></div>`).join('');callLucide();}
-
-
-function toggleSearch() {
-  const bar=document.getElementById('search-bar');
-  if(currentTab!=='tasks'){switchTab('tasks');setTimeout(toggleSearch,100);return;}
-  bar.classList.toggle('hidden');
-  if(!bar.classList.contains('hidden')) document.getElementById('search-input').focus();
-  else{document.getElementById('search-input').value='';renderMyTasks();}
-}
 
 /* ═══════════════════════════════════════
    PICKERS
