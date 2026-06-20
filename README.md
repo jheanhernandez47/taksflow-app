@@ -1,4 +1,4 @@
-[README.md](https://github.com/user-attachments/files/29166272/README.md)
+[README.md](https://github.com/user-attachments/files/29166754/README.md)
 # TaskFlow — PWA de Gestión de Tareas
 
 App de tareas offline-first construida como PWA, lista para Netlify y Median.co.
@@ -37,14 +37,14 @@ taskapp/
 ## Funcionalidades
 
 - ✅ Tareas con título, descripción, fecha límite y subtareas
+- 🏠 **Pantalla de Inicio** — tareas más próximas a vencer, proyectos vistos recientemente, y tareas añadidas recientemente
 - 📁 Proyectos estilo Asana (vistas Lista / Tablero / Resumen)
 - 📂 Secciones personalizables por proyecto y en "Mis tareas" (con "Tareas recientes" por defecto)
 - 🖱️ **Drag & drop** en el Tablero para mover tareas entre secciones (mouse y táctil)
 - ➕ **Botón flotante con menú** — un toque despliega "Nueva tarea" / "Nuevo proyecto"
-- 🧭 **Íconos Lucide** en toda la interfaz de navegación, botones y encabezados
-- 👤 Menú de usuario (esquina superior derecha) con acceso al Resumen y notificaciones
-- 👤 **Pantalla de perfil completa** — foto (subida desde el dispositivo, guardada como base64 en localStorage), nombre editable con iniciales automáticas como avatar de respaldo, notificaciones, exportar/importar datos en .json, y "Acerca de"
-- 🔍 Búsqueda de tareas
+- 🧭 **Barra de navegación inferior** con 5 accesos: Inicio, Mis tareas, Proyectos, Buscar y Perfil
+- 🔍 **Búsqueda dedicada** con filtro por Tareas o Proyectos
+- 👤 **Pantalla de perfil completa** — foto (subida desde el dispositivo, guardada como base64 en localStorage), nombre editable con ícono de lápiz para activar la edición e iniciales automáticas como avatar de respaldo, acceso al Resumen, notificaciones, exportar/importar datos en .json, y "Acerca de"
 - 🔔 Notificaciones de vencimiento (con verificación de soporte del navegador)
 - 🌙 Dark mode nativo
 - 📶 Funciona 100% offline — datos en `localStorage`, Service Worker cachea los recursos (incluido el script de íconos tras la primera carga)
