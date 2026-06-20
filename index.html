@@ -440,8 +440,8 @@ body{background:var(--bg-base);color:var(--text-1);font-family:-apple-system,Bli
       <button type="button" id="search-clear-btn" class="search-clear-btn hidden" onclick="clearSearchInput()"><i data-lucide="x" class="ico-sm"></i></button>
     </div>
     <div class="chips" style="margin-top:12px">
-      <div class="chip active" onclick="setSearchScope('tasks',this)">Tareas</div>
-      <div class="chip" onclick="setSearchScope('projects',this)">Proyectos</div>
+      <div class="chip active" onclick="toggleSearchScope('tasks',this)">Tareas</div>
+      <div class="chip active" onclick="toggleSearchScope('projects',this)">Proyectos</div>
     </div>
   </div>
   <div class="proj-detail-content" id="search-results"></div>
@@ -818,11 +818,16 @@ function closeSummary() {
 
 /* ═══════════════════════════════════════
    SEARCH PANEL (standalone, accessed from
-   bottom nav — searches tasks or projects)
+   bottom nav — searches tasks and/or
+   projects via deselectable filter chips)
 ═══════════════════════════════════════ */
-let searchScope = 'tasks';
+const ALL_SEARCH_SCOPES = ['tasks','projects'];
+let searchScopes = new Set(ALL_SEARCH_SCOPES); // both active by default
 
 function openSearchPanel() {
+  searchScopes = new Set(ALL_SEARCH_SCOPES);
+  document.querySelectorAll('#search-page .chip').forEach(c=>c.classList.add('active'));
+  updateSearchPlaceholder();
   document.getElementById('search-page').classList.add('open');
   renderSearchResults();
   callLucide();
@@ -833,13 +838,27 @@ function closeSearchPanel() {
   document.getElementById('search-page').classList.remove('open');
 }
 
-function setSearchScope(scope, el) {
-  searchScope = scope;
-  document.querySelectorAll('#search-page .chip').forEach(c=>c.classList.remove('active'));
-  el.classList.add('active');
-  const input = document.getElementById('global-search-input');
-  input.placeholder = scope === 'tasks' ? 'Buscar tareas...' : 'Buscar proyectos...';
+function toggleSearchScope(scope, el) {
+  if (searchScopes.has(scope)) {
+    searchScopes.delete(scope);
+    el.classList.remove('active');
+  } else {
+    searchScopes.add(scope);
+    el.classList.add('active');
+  }
+  updateSearchPlaceholder();
   renderSearchResults();
+}
+
+function updateSearchPlaceholder() {
+  const input = document.getElementById('global-search-input');
+  if (searchScopes.size === 2 || searchScopes.size === 0) {
+    input.placeholder = 'Buscar tareas o proyectos...';
+  } else if (searchScopes.has('tasks')) {
+    input.placeholder = 'Buscar tareas...';
+  } else {
+    input.placeholder = 'Buscar proyectos...';
+  }
 }
 
 function clearSearchInput() {
@@ -856,32 +875,42 @@ function renderSearchResults() {
 
   const container = document.getElementById('search-results');
 
-  if (!q) {
-    container.innerHTML = `<div class="search-empty-hint"><div class="empty-icon"><i data-lucide="search"></i></div><div class="empty-msg">Escribe para buscar ${searchScope==='tasks'?'tareas':'proyectos'}</div></div>`;
+  if (searchScopes.size === 0) {
+    container.innerHTML = `<div class="search-empty-hint"><div class="empty-icon"><i data-lucide="filter"></i></div><div class="empty-msg">Selecciona al menos un filtro para buscar</div></div>`;
     callLucide();
     return;
   }
 
-  if (searchScope === 'tasks') {
+  if (!q) {
+    const scopeLabel = searchScopes.size === 2 ? 'tareas o proyectos' : (searchScopes.has('tasks') ? 'tareas' : 'proyectos');
+    container.innerHTML = `<div class="search-empty-hint"><div class="empty-icon"><i data-lucide="search"></i></div><div class="empty-msg">Escribe para buscar ${scopeLabel}</div></div>`;
+    callLucide();
+    return;
+  }
+
+  let html = '';
+  let totalMatches = 0;
+
+  if (searchScopes.has('tasks')) {
     const matches = tasks.filter(t =>
       t.title.toLowerCase().includes(q) || (t.desc||'').toLowerCase().includes(q)
     );
-    if (!matches.length) {
-      container.innerHTML = `<div class="search-empty-hint"><div class="empty-icon"><i data-lucide="search-x"></i></div><div class="empty-msg">Sin resultados para "${esc(input.value.trim())}"</div></div>`;
-    } else {
+    totalMatches += matches.length;
+    if (matches.length) {
       const pending = matches.filter(t=>!t.done);
       const done = matches.filter(t=>t.done);
-      let html = '';
-      if (pending.length) html += `<div class="search-result-section-label">Pendientes</div>` + pending.map(t=>taskCardHTML(t)).join('');
-      if (done.length) html += `<div class="search-result-section-label">Completadas</div>` + done.map(t=>taskCardHTML(t)).join('');
-      container.innerHTML = html;
+      html += `<div class="search-result-section-label">Tareas${pending.length||done.length?` (${matches.length})`:''}</div>`;
+      if (pending.length) html += pending.map(t=>taskCardHTML(t)).join('');
+      if (done.length) html += done.map(t=>taskCardHTML(t)).join('');
     }
-  } else {
+  }
+
+  if (searchScopes.has('projects')) {
     const matches = projects.filter(p => p.name.toLowerCase().includes(q));
-    if (!matches.length) {
-      container.innerHTML = `<div class="search-empty-hint"><div class="empty-icon"><i data-lucide="search-x"></i></div><div class="empty-msg">Sin resultados para "${esc(input.value.trim())}"</div></div>`;
-    } else {
-      container.innerHTML = matches.map(p=>{
+    totalMatches += matches.length;
+    if (matches.length) {
+      html += `<div class="search-result-section-label">Proyectos (${matches.length})</div>`;
+      html += matches.map(p=>{
         const pts = tasks.filter(t=>t.project===p.id);
         const done = pts.filter(t=>t.done).length;
         return `<div class="proj-list-item" onclick="closeSearchPanel();openProjectDetail('${p.id}')">
@@ -893,6 +922,12 @@ function renderSearchResults() {
       }).join('');
     }
   }
+
+  if (!totalMatches) {
+    html = `<div class="search-empty-hint"><div class="empty-icon"><i data-lucide="search-x"></i></div><div class="empty-msg">Sin resultados para "${esc(input.value.trim())}"</div></div>`;
+  }
+
+  container.innerHTML = html;
   callLucide();
 }
 
