@@ -101,6 +101,7 @@ body{background:var(--bg-base);color:var(--text-1);font-family:-apple-system,Bli
 .task-meta{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;align-items:center}
 .meta-pill{display:inline-flex;align-items:center;gap:3px;font-size:11px;padding:2px 7px;border-radius:8px}
 .meta-pill.date{color:var(--warn);background:var(--warn-dim)}
+.meta-pill.tag-pill{color:var(--accent);background:var(--accent-dim)}
 .meta-pill.date.overdue{color:var(--danger);background:var(--danger-dim)}
 .subtask-count{margin-left:auto;font-size:11px;color:var(--text-3)}
 .subtask-bar{height:3px;background:var(--border);border-radius:3px;margin-top:7px;overflow:hidden}
@@ -136,6 +137,68 @@ body{background:var(--bg-base);color:var(--text-1);font-family:-apple-system,Bli
 #summary-page{position:fixed;inset:0;background:var(--bg-base);z-index:150;transform:translateX(100%);transition:transform .25s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column}
 #summary-page.open{transform:translateX(0)}
 #profile-page{position:fixed;inset:0;background:var(--bg-base);z-index:150;transform:translateX(100%);transition:transform .25s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column}
+
+/* FOCUS / POMODORO SCREEN */
+#pomodoro-page{position:fixed;inset:0;background:radial-gradient(circle at 50% 0%,#1a1d2e 0%,var(--bg-base) 60%);z-index:170;display:flex;flex-direction:column;transform:translateY(100%);transition:transform .3s cubic-bezier(.4,0,.2,1)}
+
+/* PROJECT SUGGESTER */
+#suggester-page{position:fixed;inset:0;background:var(--bg-base);z-index:160;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .25s cubic-bezier(.4,0,.2,1)}
+#suggester-page.open{transform:translateX(0)}
+.suggester-hero{padding:18px 18px 6px;text-align:center;flex-shrink:0}
+.suggester-hero-icon{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#a78bfa);display:flex;align-items:center;justify-content:center;color:#fff;margin:0 auto 12px}
+.suggester-hero-title{font-size:17px;font-weight:700;margin-bottom:6px}
+.suggester-hero-sub{font-size:13px;color:var(--text-2);line-height:1.5;max-width:340px;margin:0 auto}
+.suggester-hero-sub strong{color:var(--accent)}
+.suggester-section-label{font-size:11px;font-weight:700;letter-spacing:1px;color:var(--text-3);text-transform:uppercase;margin:18px 0 8px}
+.suggester-section-label:first-child{margin-top:0}
+.suggester-item{display:flex;align-items:center;gap:10px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:11px 12px;margin-bottom:6px;cursor:pointer;transition:all .15s}
+.suggester-item:active{background:var(--bg-hover)}
+.suggester-item.unchecked{opacity:.45}
+.suggester-item.unchecked .suggester-item-title{text-decoration:line-through}
+.suggester-item-check{width:20px;height:20px;border-radius:6px;border:2px solid var(--border-2);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.suggester-item-check.checked{background:var(--accent);border-color:var(--accent)}
+.suggester-item-check.checked::after{content:'✓';color:#fff;font-size:12px;font-weight:700}
+.suggester-item-title{font-size:13.5px;color:var(--text-1);flex:1}
+.suggester-footer{display:flex;gap:10px;padding:14px 16px calc(14px + env(safe-area-inset-bottom,0));border-top:1px solid var(--border);background:var(--bg-surface);flex-shrink:0}
+.suggester-footer .btn{margin:0}
+.suggester-count-badge{font-size:11px;background:var(--accent);color:#fff;border-radius:10px;padding:1px 7px;margin-left:6px}
+#pomodoro-page.open{transform:translateY(0)}
+.pomo-header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;flex-shrink:0}
+.pomo-back{padding:6px 4px}
+.pomo-settings-btn{background:var(--bg-card);border:1px solid var(--border)}
+.pomo-body{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 24px 24px;text-align:center;gap:6px}
+.pomo-task-title{font-size:15px;font-weight:600;color:var(--text-1);max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pomo-mode-label{font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);margin-bottom:18px}
+.pomo-mode-label.break-mode{color:var(--success)}
+
+.pomo-ring-wrap{position:relative;width:240px;height:240px;margin-bottom:30px}
+.pomo-ring-svg{width:100%;height:100%;transform:rotate(-90deg)}
+.pomo-ring-track{fill:none;stroke:var(--bg-card);stroke-width:10}
+.pomo-ring-progress{fill:none;stroke:var(--accent);stroke-width:10;stroke-linecap:round;stroke-dasharray:565.48;stroke-dashoffset:0;transition:stroke-dashoffset 1s linear,stroke .3s}
+.pomo-ring-progress.break-mode{stroke:var(--success)}
+.pomo-time-display{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:46px;font-weight:700;color:var(--text-1);font-variant-numeric:tabular-nums;letter-spacing:-1px}
+
+.pomo-controls{display:flex;align-items:center;justify-content:center;gap:20px;margin-bottom:28px}
+.pomo-ctrl-btn{border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.pomo-ctrl-primary{width:72px;height:72px;border-radius:50%;background:var(--accent);color:#fff;box-shadow:0 6px 24px var(--accent-glow,#6c63ff44)}
+.pomo-ctrl-primary:active{transform:scale(.93)}
+.pomo-ctrl-primary.is-running{background:var(--warn)}
+.pomo-ctrl-secondary{width:50px;height:50px;border-radius:50%;background:var(--bg-card);border:1px solid var(--border);color:var(--text-2)}
+.pomo-ctrl-secondary:active{background:var(--bg-hover);transform:scale(.93)}
+
+.pomo-stats-row{display:flex;gap:36px}
+.pomo-stat{text-align:center}
+.pomo-stat-num{font-size:22px;font-weight:700;color:var(--text-1)}
+.pomo-stat-lbl{font-size:11px;color:var(--text-3);margin-top:2px}
+
+.pomo-settings-overlay{position:fixed;inset:0;background:#00000088;z-index:200;display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity .2s}
+.pomo-settings-overlay.open{opacity:1;pointer-events:all}
+.pomo-settings-sheet{width:100%;background:var(--bg-surface);border-radius:var(--radius-xl) var(--radius-xl) 0 0;padding:0 0 env(safe-area-inset-bottom,16px);transform:translateY(100%);transition:transform .25s cubic-bezier(.4,0,.2,1)}
+.pomo-settings-overlay.open .pomo-settings-sheet{transform:translateY(0)}
+
+.focus-cta-btn{margin-top:14px;width:100%;display:flex;align-items:center;justify-content:center;gap:8px;background:var(--accent-dim);border:1px solid var(--accent);color:var(--accent);font-size:14px;font-weight:600;padding:12px;border-radius:var(--radius-md);cursor:pointer;transition:all .15s}
+.focus-cta-btn:active{background:var(--accent);color:#fff;transform:scale(.98)}
+.focus-cta-mins{font-weight:400;opacity:.8;font-size:12px}
 #profile-page.open{transform:translateX(0)}
 #search-page{position:fixed;inset:0;background:var(--bg-base);z-index:150;transform:translateX(100%);transition:transform .25s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column}
 #search-page.open{transform:translateX(0)}
@@ -265,6 +328,14 @@ body{background:var(--bg-base);color:var(--text-1);font-family:-apple-system,Bli
 /* FORM */
 .field{margin-bottom:14px}
 .field label{display:block;font-size:12px;font-weight:600;color:var(--text-2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px}
+.nlp-hint-label{text-transform:none;font-weight:400;letter-spacing:0;color:var(--text-3);font-size:11px}
+.nlp-preview{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;min-height:0}
+.nlp-chip{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:4px 9px;border-radius:12px;animation:nlpPop .18s ease-out}
+.nlp-chip.nlp-date{background:var(--warn-dim);color:var(--warn)}
+.nlp-chip.nlp-project{background:#0c2a3d;color:var(--blue)}
+.nlp-chip.nlp-project.nlp-project-new{background:var(--bg-input);color:var(--text-3);border:1px dashed var(--border-2)}
+.nlp-chip.nlp-tag{background:var(--accent-dim);color:var(--accent)}
+@keyframes nlpPop{from{transform:scale(.8);opacity:0}to{transform:scale(1);opacity:1}}
 .field input,.field textarea,.field select{width:100%;background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-1);font-size:14px;padding:10px 12px;outline:none;font-family:inherit;transition:border-color .15s}
 .field input:focus,.field textarea:focus,.field select:focus{border-color:var(--accent)}
 .field textarea{resize:none;min-height:80px}
@@ -447,6 +518,83 @@ body{background:var(--bg-base);color:var(--text-1);font-family:-apple-system,Bli
   <div class="proj-detail-content" id="search-results"></div>
 </div>
 
+<!-- ── POMODORO / FOCUS PAGE ─────────────────── -->
+<div id="pomodoro-page">
+  <div class="pomo-header">
+    <button class="back-btn pomo-back" onclick="exitFocus()"><i data-lucide="chevron-left"></i> Salir</button>
+    <button class="icon-btn pomo-settings-btn" onclick="togglePomoSettings()" title="Ajustar tiempos"><i data-lucide="settings-2" class="ico-md"></i></button>
+  </div>
+
+  <div class="pomo-body">
+    <div class="pomo-task-title" id="pomo-task-title">Tarea</div>
+    <div class="pomo-mode-label" id="pomo-mode-label">Enfoque</div>
+
+    <div class="pomo-ring-wrap">
+      <svg viewBox="0 0 200 200" class="pomo-ring-svg">
+        <circle cx="100" cy="100" r="90" class="pomo-ring-track"></circle>
+        <circle cx="100" cy="100" r="90" class="pomo-ring-progress" id="pomo-ring-progress"></circle>
+      </svg>
+      <div class="pomo-time-display" id="pomo-time-display">25:00</div>
+    </div>
+
+    <div class="pomo-controls">
+      <button class="pomo-ctrl-btn pomo-ctrl-secondary" id="pomo-reset-btn" onclick="resetPomodoro()" title="Reiniciar"><i data-lucide="rotate-ccw" class="ico-md"></i></button>
+      <button class="pomo-ctrl-btn pomo-ctrl-primary" id="pomo-play-btn" onclick="togglePomodoro()"><i data-lucide="play" class="ico-xl"></i></button>
+      <button class="pomo-ctrl-btn pomo-ctrl-secondary" id="pomo-skip-btn" onclick="skipPomodoroPhase()" title="Saltar fase"><i data-lucide="skip-forward" class="ico-md"></i></button>
+    </div>
+
+    <div class="pomo-stats-row">
+      <div class="pomo-stat">
+        <div class="pomo-stat-num" id="pomo-cycles-count">0</div>
+        <div class="pomo-stat-lbl">Ciclos hoy</div>
+      </div>
+      <div class="pomo-stat">
+        <div class="pomo-stat-num" id="pomo-total-minutes">0</div>
+        <div class="pomo-stat-lbl">Min. invertidos</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings popover -->
+  <div class="pomo-settings-overlay" id="pomo-settings-overlay" onclick="closePomoSettings()">
+    <div class="pomo-settings-sheet" onclick="event.stopPropagation()">
+      <div class="sheet-handle"></div>
+      <div class="sheet-title">Duración del ciclo</div>
+      <div class="sheet-body">
+        <div class="field">
+          <label>Minutos de enfoque</label>
+          <input type="number" id="pomo-work-input" min="1" max="120" value="25">
+        </div>
+        <div class="field">
+          <label>Minutos de descanso</label>
+          <input type="number" id="pomo-break-input" min="1" max="60" value="5">
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-ghost" onclick="closePomoSettings()">Cancelar</button>
+          <button class="btn btn-primary" onclick="savePomoSettings()">Aplicar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── PROJECT SUGGESTER PAGE ─────────────────── -->
+<div id="suggester-page">
+  <div class="proj-detail-header">
+    <button class="back-btn" onclick="closeSuggester(false)"><i data-lucide="chevron-left"></i> Volver</button>
+  </div>
+  <div class="suggester-hero">
+    <div class="suggester-hero-icon"><i data-lucide="sparkles"></i></div>
+    <div class="suggester-hero-title">Sugerencias para <span id="suggester-proj-name"></span></div>
+    <div class="suggester-hero-sub">Detectamos que se parece a un proyecto de <strong id="suggester-tpl-label"></strong>. Elige las tareas que quieres agregar — puedes destildar las que no necesites.</div>
+  </div>
+  <div class="proj-detail-content" id="suggester-list"></div>
+  <div class="suggester-footer">
+    <button class="btn btn-ghost" onclick="closeSuggester(false)">Omitir, crear vacío</button>
+    <button class="btn btn-primary" id="suggester-confirm-btn" onclick="confirmSuggestions()">Agregar tareas seleccionadas</button>
+  </div>
+</div>
+
 <!-- ── PROFILE PAGE ──────────────────────────── -->
 <div id="profile-page">
   <div class="proj-detail-header">
@@ -580,7 +728,11 @@ body{background:var(--bg-base);color:var(--text-1);font-family:-apple-system,Bli
     <div class="sheet-handle"></div>
     <div class="sheet-title" id="sheet-title">Nueva tarea</div>
     <div class="sheet-body">
-      <div class="field"><label>Título *</label><input type="text" id="f-title" placeholder="¿Qué necesitas hacer?"></div>
+      <div class="field">
+        <label>Título * <span class="nlp-hint-label">— escribe en lenguaje natural</span></label>
+        <input type="text" id="f-title" placeholder="ej. Entregar informe mañana 6pm #Escuela @Urgente" oninput="parseTitleNLP()" autocomplete="off">
+        <div class="nlp-preview" id="nlp-preview"></div>
+      </div>
       <div class="field"><label>Descripción</label><textarea id="f-desc" placeholder="Detalles opcionales..."></textarea></div>
       <div style="display:flex;gap:10px">
         <div class="field" style="flex:1">
@@ -594,7 +746,10 @@ body{background:var(--bg-base);color:var(--text-1);font-family:-apple-system,Bli
           <select id="f-section"><option value="">Tareas recientes</option></select>
         </div>
       </div>
-      <div class="field"><label>Fecha límite</label><input type="datetime-local" id="f-due"></div>
+      <div style="display:flex;gap:10px">
+        <div class="field" style="flex:1"><label>Fecha límite</label><input type="datetime-local" id="f-due"></div>
+        <div class="field" style="flex:1"><label>Etiqueta</label><input type="text" id="f-tag" placeholder="ej. Urgente" maxlength="20"></div>
+      </div>
       <div class="field">
         <label>Subtareas</label>
         <div class="subtask-input-row">
@@ -663,6 +818,10 @@ let projects = JSON.parse(localStorage.getItem('tf2_projects') || '[]');
 let sections = JSON.parse(localStorage.getItem('tf2_sections') || '[]');
 // profile: { name, avatarDataUrl }
 let profile  = JSON.parse(localStorage.getItem('tf2_profile')  || 'null') || { name: '', avatarDataUrl: '' };
+// pomoSettings: { workMin, breakMin }
+let pomoSettings = JSON.parse(localStorage.getItem('tf2_pomo_settings') || 'null') || { workMin: 25, breakMin: 5 };
+// pomoLog: { [dateStr]: cyclesCompleted } — used for "Ciclos hoy"
+let pomoLog = JSON.parse(localStorage.getItem('tf2_pomo_log') || '{}');
 
 const save = () => {
   localStorage.setItem('tf2_tasks',    JSON.stringify(tasks));
@@ -672,6 +831,11 @@ const save = () => {
 
 const saveProfile = () => {
   localStorage.setItem('tf2_profile', JSON.stringify(profile));
+};
+
+const savePomoState = () => {
+  localStorage.setItem('tf2_pomo_settings', JSON.stringify(pomoSettings));
+  localStorage.setItem('tf2_pomo_log', JSON.stringify(pomoLog));
 };
 
 // recentProjectViews: { [projectId]: timestamp }
@@ -1486,6 +1650,7 @@ function taskCardHTML(t) {
       <div class="task-meta">
         ${proj?`<span style="font-size:11px;color:${proj.color};background:${proj.color}22;padding:2px 7px;border-radius:8px">${proj.icon} ${esc(proj.name)}</span>`:''}
         ${dueStr?`<span class="meta-pill date ${isDue&&!t.done?'overdue':''}"><i data-lucide="calendar" class="ico-sm"></i> ${dueStr}</span>`:''}
+        ${t.tag?`<span class="meta-pill tag-pill"><i data-lucide="tag" class="ico-sm"></i> ${esc(t.tag)}</span>`:''}
         ${t.subtasks.length?`<span class="subtask-count">${dc}/${t.subtasks.length} sub</span>`:''}
       </div>
       ${t.subtasks.length?`<div class="subtask-bar"><div class="subtask-fill" style="width:${pct}%"></div></div>`:''}
@@ -1572,6 +1737,7 @@ function openDetail(id) {
         <h2 style="font-size:20px;font-weight:700;line-height:1.3;${t.done?'text-decoration:line-through;color:var(--text-3)':''}">${esc(t.title)}</h2>
       </div>
       ${t.desc?`<p style="color:var(--text-2);font-size:14px;line-height:1.6;background:var(--bg-card);padding:12px;border-radius:var(--radius-sm)">${esc(t.desc).replace(/\n/g,'<br>')}</p>`:''}
+      ${!t.done?`<button type="button" class="focus-cta-btn" onclick="enterFocus('${t.id}')"><i data-lucide="timer" class="ico-md"></i> Enfocarme en esto${t.focusMinutes?` <span class="focus-cta-mins">· ${t.focusMinutes} min invertidos</span>`:''}</button>`:''}
     </div>
     <div class="detail-section">
       <div class="detail-sec-title">Detalles</div>
@@ -1579,6 +1745,7 @@ function openDetail(id) {
         ${proj?`<div style="background:var(--bg-card);padding:10px;border-radius:var(--radius-sm)"><div style="font-size:11px;color:var(--text-3);margin-bottom:3px">PROYECTO</div><div style="font-size:13px;color:${proj.color}">${proj.icon} ${esc(proj.name)}</div></div>`:''}
         ${sec?`<div style="background:var(--bg-card);padding:10px;border-radius:var(--radius-sm)"><div style="font-size:11px;color:var(--text-3);margin-bottom:3px">SECCIÓN</div><div style="font-size:13px">${esc(sec.name)}</div></div>`:''}
         <div style="background:var(--bg-card);padding:10px;border-radius:var(--radius-sm)"><div style="font-size:11px;color:var(--text-3);margin-bottom:3px">FECHA LÍMITE</div><div style="font-size:13px;color:${isDue&&!t.done?'var(--danger)':'var(--text-1)'}">${t.due?formatDateTime(new Date(t.due)):'Sin fecha'}</div></div>
+        ${t.tag?`<div style="background:var(--bg-card);padding:10px;border-radius:var(--radius-sm)"><div style="font-size:11px;color:var(--text-3);margin-bottom:3px">ETIQUETA</div><div style="font-size:13px;color:var(--accent)">🏷 ${esc(t.tag)}</div></div>`:''}
       </div>
     </div>
     ${t.subtasks.length?`
@@ -1605,14 +1772,518 @@ function editCurrentTask() {
 }
 
 /* ═══════════════════════════════════════
+   FOCUS MODE / POMODORO TIMER
+═══════════════════════════════════════ */
+const POMO_RING_CIRCUMFERENCE = 565.48; // 2 * π * 90
+
+let pomoTaskId = null;
+let pomoPhase = 'work';        // 'work' | 'break'
+let pomoSecondsLeft = 0;
+let pomoTotalSeconds = 0;
+let pomoRunning = false;
+let pomoIntervalHandle = null;
+
+function todayKey() {
+  return new Date().toISOString().slice(0,10);
+}
+
+function enterFocus(taskId) {
+  const t = tasks.find(x=>x.id===taskId);
+  if (!t) return;
+  pomoTaskId = taskId;
+  pomoPhase = 'work';
+  document.getElementById('pomo-task-title').textContent = t.title;
+  document.getElementById('pomo-work-input').value = pomoSettings.workMin;
+  document.getElementById('pomo-break-input').value = pomoSettings.breakMin;
+  resetPomodoro();
+  updatePomoStatsDisplay();
+  document.getElementById('pomodoro-page').classList.add('open');
+  callLucide();
+}
+
+function exitFocus() {
+  pausePomodoro();
+  document.getElementById('pomodoro-page').classList.remove('open');
+  if (pomoTaskId) {
+    // Refresh the task detail view so updated focus minutes show immediately.
+    if (document.getElementById('detail-page').classList.contains('open')) openDetail(pomoTaskId);
+  }
+  pomoTaskId = null;
+}
+
+function setPomoPhase(phase) {
+  pomoPhase = phase;
+  const mins = phase === 'work' ? pomoSettings.workMin : pomoSettings.breakMin;
+  pomoTotalSeconds = mins * 60;
+  pomoSecondsLeft = pomoTotalSeconds;
+  const label = document.getElementById('pomo-mode-label');
+  label.textContent = phase === 'work' ? 'Enfoque' : 'Descanso';
+  label.classList.toggle('break-mode', phase === 'break');
+  document.getElementById('pomo-ring-progress').classList.toggle('break-mode', phase === 'break');
+  updatePomoDisplay();
+}
+
+function resetPomodoro() {
+  pausePomodoro();
+  setPomoPhase('work');
+}
+
+function togglePomodoro() {
+  if (pomoRunning) pausePomodoro();
+  else startPomodoro();
+}
+
+function startPomodoro() {
+  if (pomoRunning) return;
+  pomoRunning = true;
+  const btn = document.getElementById('pomo-play-btn');
+  btn.innerHTML = '<i data-lucide="pause" class="ico-xl"></i>';
+  btn.classList.add('is-running');
+  callLucide();
+  pomoIntervalHandle = setInterval(pomoTick, 1000);
+}
+
+function pausePomodoro() {
+  pomoRunning = false;
+  clearInterval(pomoIntervalHandle);
+  pomoIntervalHandle = null;
+  const btn = document.getElementById('pomo-play-btn');
+  if (btn) {
+    btn.innerHTML = '<i data-lucide="play" class="ico-xl"></i>';
+    btn.classList.remove('is-running');
+    callLucide();
+  }
+}
+
+function pomoTick() {
+  pomoSecondsLeft--;
+  if (pomoPhase === 'work' && pomoSecondsLeft >= 0 && pomoSecondsLeft % 60 === 0) {
+    creditFocusMinutes(1);
+  }
+  updatePomoDisplay();
+  if (pomoSecondsLeft <= 0) {
+    completePomoPhase();
+  }
+}
+
+function creditFocusMinutes(mins) {
+  if (!pomoTaskId) return;
+  tasks = tasks.map(t => t.id === pomoTaskId ? { ...t, focusMinutes: (t.focusMinutes || 0) + mins } : t);
+  save();
+  updatePomoStatsDisplay();
+}
+
+function completePomoPhase() {
+  pausePomodoro();
+  if (pomoPhase === 'work') {
+    const key = todayKey();
+    pomoLog[key] = (pomoLog[key] || 0) + 1;
+    savePomoState();
+    showToast('🍅 ¡Ciclo de enfoque completado!');
+    setPomoPhase('break');
+  } else {
+    showToast('☕ Descanso terminado — ¿seguimos?');
+    setPomoPhase('work');
+  }
+  updatePomoStatsDisplay();
+}
+
+function skipPomodoroPhase() {
+  pausePomodoro();
+  setPomoPhase(pomoPhase === 'work' ? 'break' : 'work');
+}
+
+function updatePomoDisplay() {
+  const m = Math.max(0, Math.floor(pomoSecondsLeft / 60));
+  const s = Math.max(0, pomoSecondsLeft % 60);
+  document.getElementById('pomo-time-display').textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  const fraction = pomoTotalSeconds > 0 ? pomoSecondsLeft / pomoTotalSeconds : 0;
+  const offset = POMO_RING_CIRCUMFERENCE * (1 - fraction);
+  document.getElementById('pomo-ring-progress').style.strokeDashoffset = offset;
+}
+
+function updatePomoStatsDisplay() {
+  const cyclesToday = pomoLog[todayKey()] || 0;
+  document.getElementById('pomo-cycles-count').textContent = cyclesToday;
+  const t = tasks.find(x=>x.id===pomoTaskId);
+  document.getElementById('pomo-total-minutes').textContent = Math.floor(t?.focusMinutes || 0);
+}
+
+function togglePomoSettings() {
+  document.getElementById('pomo-settings-overlay').classList.toggle('open');
+}
+function closePomoSettings() {
+  document.getElementById('pomo-settings-overlay').classList.remove('open');
+}
+function savePomoSettings() {
+  const work = parseInt(document.getElementById('pomo-work-input').value, 10);
+  const brk  = parseInt(document.getElementById('pomo-break-input').value, 10);
+  if (!work || work < 1 || work > 120 || !brk || brk < 1 || brk > 60) {
+    showToast('⚠ Revisa los minutos ingresados');
+    return;
+  }
+  pomoSettings = { workMin: work, breakMin: brk };
+  savePomoState();
+  closePomoSettings();
+  resetPomodoro();
+  showToast('⏱ Duración actualizada');
+}
+
+/* ═══════════════════════════════════════
+   PROJECT SUGGESTER — "Sistema experto"
+   Offline rule-based template matching with
+   simple frequency-based learning: tracks how
+   often each suggested task is accepted vs.
+   rejected per template, and stops suggesting
+   tasks the user consistently dismisses.
+═══════════════════════════════════════ */
+const PROJECT_TEMPLATES = [
+  {
+    id: 'tesis', keywords: ['tesis','trabajo de grado','tdg','proyecto de grado','monografia'],
+    sections: ['Investigación','Redacción','Revisión','Defensa'],
+    tasks: [
+      { title:'Definir tema y planteamiento del problema', section:'Investigación' },
+      { title:'Buscar y organizar referencias bibliográficas', section:'Investigación' },
+      { title:'Redactar marco teórico', section:'Redacción' },
+      { title:'Redactar metodología', section:'Redacción' },
+      { title:'Recolectar y analizar datos', section:'Investigación' },
+      { title:'Redactar resultados y conclusiones', section:'Redacción' },
+      { title:'Revisión con el tutor', section:'Revisión' },
+      { title:'Corregir observaciones del tutor', section:'Revisión' },
+      { title:'Preparar presentación de defensa', section:'Defensa' },
+      { title:'Ensayar la defensa oral', section:'Defensa' },
+    ]
+  },
+  {
+    id: 'viaje', keywords: ['viaje','vacaciones','trip','viajar'],
+    sections: ['Antes de viajar','Equipaje','Durante el viaje'],
+    tasks: [
+      { title:'Reservar vuelos', section:'Antes de viajar' },
+      { title:'Reservar alojamiento', section:'Antes de viajar' },
+      { title:'Verificar documentos y pasaporte', section:'Antes de viajar' },
+      { title:'Contratar seguro de viaje', section:'Antes de viajar' },
+      { title:'Hacer lista de equipaje', section:'Equipaje' },
+      { title:'Cambiar moneda / configurar tarjetas', section:'Antes de viajar' },
+      { title:'Investigar lugares para visitar', section:'Durante el viaje' },
+      { title:'Reservar transporte local', section:'Durante el viaje' },
+      { title:'Avisar al banco sobre el viaje', section:'Antes de viajar' },
+    ]
+  },
+  {
+    id: 'boda', keywords: ['boda','matrimonio','casamiento'],
+    sections: ['Logística','Proveedores','Invitados'],
+    tasks: [
+      { title:'Definir presupuesto', section:'Logística' },
+      { title:'Reservar lugar para la ceremonia', section:'Logística' },
+      { title:'Reservar lugar para la recepción', section:'Logística' },
+      { title:'Contratar catering', section:'Proveedores' },
+      { title:'Contratar fotógrafo', section:'Proveedores' },
+      { title:'Contratar música/DJ', section:'Proveedores' },
+      { title:'Elegir vestido/traje', section:'Logística' },
+      { title:'Enviar invitaciones', section:'Invitados' },
+      { title:'Confirmar lista de invitados', section:'Invitados' },
+      { title:'Comprar anillos', section:'Logística' },
+    ]
+  },
+  {
+    id: 'mudanza', keywords: ['mudanza','mudarme','cambio de casa','nueva casa'],
+    sections: ['Antes de mudarse','Empaque','Después de mudarse'],
+    tasks: [
+      { title:'Buscar empresa de mudanza', section:'Antes de mudarse' },
+      { title:'Conseguir cajas y material de embalaje', section:'Empaque' },
+      { title:'Empacar por habitaciones', section:'Empaque' },
+      { title:'Cambiar dirección en servicios y bancos', section:'Antes de mudarse' },
+      { title:'Dar de baja/alta servicios (luz, agua, internet)', section:'Antes de mudarse' },
+      { title:'Etiquetar cajas frágiles', section:'Empaque' },
+      { title:'Limpiar la casa anterior', section:'Después de mudarse' },
+      { title:'Desempacar y organizar nueva casa', section:'Después de mudarse' },
+    ]
+  },
+  {
+    id: 'examen', keywords: ['examen','parcial','final','estudiar','estudio'],
+    sections: ['Repaso','Práctica'],
+    tasks: [
+      { title:'Revisar el temario completo', section:'Repaso' },
+      { title:'Organizar apuntes por tema', section:'Repaso' },
+      { title:'Hacer resumen de cada tema', section:'Repaso' },
+      { title:'Resolver ejercicios de práctica', section:'Práctica' },
+      { title:'Hacer un simulacro de examen', section:'Práctica' },
+      { title:'Repasar dudas con el profesor', section:'Repaso' },
+      { title:'Descansar bien la noche anterior', section:'Práctica' },
+    ]
+  },
+  {
+    id: 'evento', keywords: ['evento','fiesta','cumpleaños','celebracion','celebración'],
+    sections: ['Planificación','El día del evento'],
+    tasks: [
+      { title:'Definir presupuesto y fecha', section:'Planificación' },
+      { title:'Reservar lugar', section:'Planificación' },
+      { title:'Enviar invitaciones', section:'Planificación' },
+      { title:'Contratar comida/catering', section:'Planificación' },
+      { title:'Comprar decoración', section:'Planificación' },
+      { title:'Confirmar asistentes', section:'El día del evento' },
+      { title:'Preparar música/entretenimiento', section:'Planificación' },
+      { title:'Coordinar montaje del lugar', section:'El día del evento' },
+    ]
+  },
+  {
+    id: 'lanzamiento', keywords: ['lanzamiento','producto','startup','negocio','emprendimiento'],
+    sections: ['Preparación','Marketing','Lanzamiento'],
+    tasks: [
+      { title:'Definir público objetivo', section:'Preparación' },
+      { title:'Terminar el producto/MVP', section:'Preparación' },
+      { title:'Crear página web o landing', section:'Marketing' },
+      { title:'Preparar campaña en redes sociales', section:'Marketing' },
+      { title:'Definir estrategia de precios', section:'Preparación' },
+      { title:'Contactar prensa/influencers', section:'Marketing' },
+      { title:'Publicar oficialmente', section:'Lanzamiento' },
+      { title:'Recolectar feedback inicial', section:'Lanzamiento' },
+    ]
+  },
+];
+
+function normalizeForMatch(s) {
+  return stripAccents((s||'').toLowerCase()).trim();
+}
+
+/** Returns the best-matching template for a project name, or null. */
+function findTemplateMatch(projectName) {
+  const norm = normalizeForMatch(projectName);
+  if (!norm) return null;
+  let best = null;
+  for (const tpl of PROJECT_TEMPLATES) {
+    for (const kw of tpl.keywords) {
+      if (norm.includes(stripAccents(kw))) {
+        // Prefer the longest keyword match (more specific = more confident)
+        if (!best || kw.length > best.matchedKeyword.length) {
+          best = { template: tpl, matchedKeyword: kw };
+        }
+      }
+    }
+  }
+  return best;
+}
+
+/* ── Learning data: per-template, per-task acceptance stats ──
+   Shape: { [templateId]: { [taskTitle]: { accepted: n, rejected: n } } }
+   A task is hidden from future suggestions once it's been rejected
+   at least 3 times AND rejected more often than accepted. */
+let suggesterStats = JSON.parse(localStorage.getItem('tf2_suggester_stats') || '{}');
+
+function saveSuggesterStats() {
+  localStorage.setItem('tf2_suggester_stats', JSON.stringify(suggesterStats));
+}
+
+function recordSuggestionChoice(templateId, taskTitle, accepted) {
+  if (!suggesterStats[templateId]) suggesterStats[templateId] = {};
+  if (!suggesterStats[templateId][taskTitle]) suggesterStats[templateId][taskTitle] = { accepted: 0, rejected: 0 };
+  if (accepted) suggesterStats[templateId][taskTitle].accepted++;
+  else suggesterStats[templateId][taskTitle].rejected++;
+  saveSuggesterStats();
+}
+
+function shouldSuppressSuggestion(templateId, taskTitle) {
+  const stat = suggesterStats[templateId]?.[taskTitle];
+  if (!stat) return false;
+  return stat.rejected >= 3 && stat.rejected > stat.accepted;
+}
+
+/* ═══════════════════════════════════════
+   NATURAL LANGUAGE PARSER
+   Detects, while typing a task title:
+   - Relative Spanish dates (mañana, el viernes,
+     en 3 días, próximo lunes, hoy, pasado mañana...)
+   - #Proyecto hashtags → matched against existing
+     projects by name (case/accent-insensitive),
+     or offered as "create new" if no match.
+   - @Etiqueta mentions → free-text tag.
+   Everything runs locally, no network calls.
+═══════════════════════════════════════ */
+const WEEKDAYS_ES = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+// Accent-insensitive aliases so "miercoles" also matches "miércoles"
+const WEEKDAY_ALIASES = {
+  'domingo':0,'lunes':1,'martes':2,'miercoles':3,'miércoles':3,
+  'jueves':4,'viernes':5,'sabado':6,'sábado':6
+};
+
+function stripAccents(s) {
+  return s.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+}
+
+/**
+ * Scans free text for the first recognizable relative-date expression.
+ * Returns { date: Date, matchText: string, matchIndex: number } or null.
+ * Time defaults to 23:59 unless an explicit hour is found (e.g. "6pm", "18:00").
+ */
+function parseRelativeDateES(text) {
+  const lower = stripAccents(text.toLowerCase());
+
+  // Captures the connector ("a las"/"a la") together with the time itself,
+  // so phrases like "mañana a las 6pm" get fully removed from the clean title.
+  const timeRegex = /\b(?:a\s+las?\s+)?(\d{1,2})(?::(\d{2}))?\s*(am|pm)\b|\b(?:a\s+las?\s+)?(\d{1,2}):(\d{2})\b/;
+  function extractTime(str) {
+    const m = str.match(timeRegex);
+    if (!m) return null;
+    if (m[1]) {
+      let h = parseInt(m[1], 10);
+      const min = m[2] ? parseInt(m[2], 10) : 0;
+      const ampm = m[3];
+      if (ampm === 'pm' && h < 12) h += 12;
+      if (ampm === 'am' && h === 12) h = 0;
+      return { h, min, matchIndex: m.index, matchLength: m[0].length };
+    } else {
+      return { h: parseInt(m[4],10), min: parseInt(m[5],10), matchIndex: m.index, matchLength: m[0].length };
+    }
+  }
+
+  const patterns = [
+    { re: /\bpasado\s*manana\b/, resolve: () => { const d=new Date(); d.setDate(d.getDate()+2); return d; } },
+    { re: /\bmanana\b/,          resolve: () => { const d=new Date(); d.setDate(d.getDate()+1); return d; } },
+    { re: /\bhoy\b/,             resolve: () => new Date() },
+    { re: /\ben\s+(\d{1,2})\s+dias?\b/, resolve: (m) => { const d=new Date(); d.setDate(d.getDate()+parseInt(m[1],10)); return d; } },
+    { re: /\b(proximo|esta)\s+(domingo|lunes|martes|miercoles|jueves|viernes|sabado)\b/,
+      resolve: (m) => {
+        const target = WEEKDAY_ALIASES[m[2]];
+        const d = new Date();
+        const cur = d.getDay();
+        let diff = (target - cur + 7) % 7;
+        // "esta" means the soonest occurrence (today counts as 0 days away);
+        // "próximo" always means next week's occurrence, even if today matches.
+        if (m[1] === 'proximo' && diff === 0) diff = 7;
+        d.setDate(d.getDate() + diff);
+        return d;
+      }
+    },
+    { re: /\bel\s+(domingo|lunes|martes|miercoles|jueves|viernes|sabado)\b/,
+      resolve: (m) => {
+        const target = WEEKDAY_ALIASES[m[1]];
+        const d = new Date();
+        const cur = d.getDay();
+        let diff = (target - cur + 7) % 7;
+        if (diff === 0) diff = 7;
+        d.setDate(d.getDate() + diff);
+        return d;
+      }
+    },
+  ];
+
+  for (const p of patterns) {
+    const m = lower.match(p.re);
+    if (m) {
+      const date = p.resolve(m);
+      const time = extractTime(lower);
+      const spans = [{ index: m.index, length: m[0].length }];
+      if (time) {
+        date.setHours(time.h, time.min, 0, 0);
+        spans.push({ index: time.matchIndex, length: time.matchLength });
+      } else {
+        date.setHours(23, 59, 0, 0);
+      }
+      return { date, spans };
+    }
+  }
+  return null;
+}
+
+/**
+ * Parses #project and @tag tokens out of the raw input.
+ * Returns { projectMatch, tagText, cleanedOfTokens }.
+ * projectMatch is either an existing project object, or
+ * { isNew: true, name } if no existing project matches.
+ */
+function parseHashtagsAndMentions(text) {
+  const hashMatch = text.match(/#([^\s#@]+)/);
+  const atMatch = text.match(/@([^\s#@]+)/);
+
+  let projectMatch = null;
+  if (hashMatch) {
+    const raw = hashMatch[1];
+    const normalized = stripAccents(raw.toLowerCase());
+    const existing = projects.find(p => stripAccents(p.name.toLowerCase()) === normalized || stripAccents(p.name.toLowerCase()).includes(normalized));
+    projectMatch = existing ? existing : { isNew: true, name: raw };
+  }
+
+  return {
+    projectMatch,
+    tagText: atMatch ? atMatch[1] : null,
+    hashSpan: hashMatch ? { index: hashMatch.index, length: hashMatch[0].length } : null,
+    atSpan: atMatch ? { index: atMatch.index, length: atMatch[0].length } : null,
+  };
+}
+
+/**
+ * Master parse: runs date + hashtag/mention detection, and returns
+ * a cleaned title with all recognized tokens stripped out.
+ */
+function parseTaskInput(rawText) {
+  const dateResult = parseRelativeDateES(rawText);
+  const tagResult = parseHashtagsAndMentions(rawText);
+
+  // Remove all recognized spans from the text to produce a clean title.
+  const spans = [];
+  if (dateResult) spans.push(...dateResult.spans);
+  if (tagResult.hashSpan) spans.push(tagResult.hashSpan);
+  if (tagResult.atSpan) spans.push(tagResult.atSpan);
+  spans.sort((a,b) => b.index - a.index); // remove from the end so indices stay valid
+
+  let cleanTitle = rawText;
+  for (const span of spans) {
+    cleanTitle = cleanTitle.slice(0, span.index) + cleanTitle.slice(span.index + span.length);
+  }
+  cleanTitle = cleanTitle.replace(/\s+/g, ' ').trim();
+
+  return {
+    cleanTitle,
+    date: dateResult ? dateResult.date : null,
+    projectMatch: tagResult.projectMatch,
+    tagText: tagResult.tagText,
+  };
+}
+
+let nlpParseResult = null;
+
+function parseTitleNLP() {
+  const raw = document.getElementById('f-title').value;
+  nlpParseResult = parseTaskInput(raw);
+  renderNLPPreview();
+}
+
+function renderNLPPreview() {
+  const container = document.getElementById('nlp-preview');
+  if (!nlpParseResult || (!nlpParseResult.date && !nlpParseResult.projectMatch && !nlpParseResult.tagText)) {
+    container.innerHTML = '';
+    return;
+  }
+  let html = '';
+  if (nlpParseResult.date) {
+    html += `<span class="nlp-chip nlp-date"><i data-lucide="calendar" class="ico-sm"></i> ${formatDate(nlpParseResult.date)}</span>`;
+  }
+  if (nlpParseResult.projectMatch) {
+    if (nlpParseResult.projectMatch.isNew) {
+      html += `<span class="nlp-chip nlp-project nlp-project-new"><i data-lucide="plus-circle" class="ico-sm"></i> Crear "${esc(nlpParseResult.projectMatch.name)}"</span>`;
+    } else {
+      html += `<span class="nlp-chip nlp-project">${nlpParseResult.projectMatch.icon} ${esc(nlpParseResult.projectMatch.name)}</span>`;
+    }
+  }
+  if (nlpParseResult.tagText) {
+    html += `<span class="nlp-chip nlp-tag"><i data-lucide="tag" class="ico-sm"></i> ${esc(nlpParseResult.tagText)}</span>`;
+  }
+  container.innerHTML = html;
+  callLucide();
+}
+
+/* ═══════════════════════════════════════
    TASK CRUD
 ═══════════════════════════════════════ */
 function openNewTask(projId, sectionId) {
   editingTaskId=null; formSubtasks=[];
+  nlpParseResult = null;
   document.getElementById('sheet-title').textContent='Nueva tarea';
   document.getElementById('f-title').value='';
   document.getElementById('f-desc').value='';
   document.getElementById('f-due').value='';
+  document.getElementById('f-tag').value='';
+  document.getElementById('nlp-preview').innerHTML='';
   document.getElementById('delete-btn').style.display='none';
   document.getElementById('subtask-list').innerHTML='';
   populateProjectSelect(projId||'');
@@ -1624,10 +2295,13 @@ function openNewTask(projId, sectionId) {
 function openEditTask(id) {
   const t=tasks.find(x=>x.id===id); if(!t) return;
   editingTaskId=id; formSubtasks=t.subtasks.map(s=>({...s}));
+  nlpParseResult = null;
   document.getElementById('sheet-title').textContent='Editar tarea';
   document.getElementById('f-title').value=t.title;
   document.getElementById('f-desc').value=t.desc||'';
   document.getElementById('f-due').value=t.due?t.due.slice(0,16):'';
+  document.getElementById('f-tag').value=t.tag||'';
+  document.getElementById('nlp-preview').innerHTML='';
   document.getElementById('delete-btn').style.display='flex';
   populateProjectSelect(t.project||'');
   populateSectionSelect(t.project||'', t.sectionId||'');
@@ -1636,24 +2310,51 @@ function openEditTask(id) {
 }
 
 function saveTask() {
-  const title=document.getElementById('f-title').value.trim();
-  if(!title){showToast('⚠ El título es obligatorio');return;}
-  const dueVal=document.getElementById('f-due').value;
-  const projId=document.getElementById('f-project').value;
+  const rawTitle = document.getElementById('f-title').value.trim();
+  if(!rawTitle){showToast('⚠ El título es obligatorio');return;}
+
+  const parsed = parseTaskInput(rawTitle);
+  const title = parsed.cleanTitle || rawTitle;
+
+  const dueVal = document.getElementById('f-due').value;
+  let projId = document.getElementById('f-project').value;
+  const manualTag = document.getElementById('f-tag').value.trim();
+
+  // NLP-detected values only fill in fields the user left empty —
+  // explicit form fields always win if the user set them.
+  let due = dueVal ? new Date(dueVal).toISOString() : '';
+  if (!due && parsed.date) due = parsed.date.toISOString();
+
+  let tag = manualTag;
+  if (!tag && parsed.tagText) tag = parsed.tagText;
+
+  if (!projId && parsed.projectMatch) {
+    if (parsed.projectMatch.isNew) {
+      const newProj = { id:'p'+Date.now(), name: parsed.projectMatch.name, icon:'📋', color:'#6c63ff', created: Date.now() };
+      projects.push(newProj);
+      projId = newProj.id;
+      showToast(`📁 Proyecto "${parsed.projectMatch.name}" creado`);
+    } else {
+      projId = parsed.projectMatch.id;
+    }
+  }
+
   let secId=document.getElementById('f-section').value;
   if(!secId) secId=MY_TASKS_DEFAULT_SECTION;
   const task={
     id:editingTaskId||'t'+Date.now(),
     title,desc:document.getElementById('f-desc').value.trim(),
     project:projId, sectionId:secId,
-    due:dueVal?new Date(dueVal).toISOString():'',
+    due, tag,
     done:editingTaskId?tasks.find(t=>t.id===editingTaskId)?.done||false:false,
+    focusMinutes:editingTaskId?tasks.find(t=>t.id===editingTaskId)?.focusMinutes||0:0,
     subtasks:formSubtasks,
     created:editingTaskId?tasks.find(t=>t.id===editingTaskId)?.created||Date.now():Date.now(),
   };
   if(editingTaskId){tasks=tasks.map(t=>t.id===editingTaskId?task:t);showToast('✏ Tarea actualizada');}
   else{tasks.unshift(task);showToast('✅ Tarea creada');}
   save(); closeSheet('task-overlay');
+  nlpParseResult = null;
   if(currentProjectId) renderProjectView(currentProjView); else render();
   scheduleNotifications();
 }
@@ -1744,11 +2445,142 @@ function saveProject() {
       document.getElementById('pd-title').textContent=selectedEmoji+' '+name;
       document.getElementById('pd-progress-fill').style.background=selectedColor;
     }
+    save(); closeSheet('proj-overlay'); render();
   } else {
-    projects.push({id:'p'+Date.now(),name,icon:selectedEmoji,color:selectedColor,created:Date.now()});
+    const newProj = {id:'p'+Date.now(),name,icon:selectedEmoji,color:selectedColor,created:Date.now()};
+    projects.push(newProj);
+    save(); closeSheet('proj-overlay'); render();
     showToast('📁 Proyecto creado');
+
+    const match = findTemplateMatch(name);
+    if (match) {
+      openSuggester(newProj, match.template);
+    }
   }
-  save(); closeSheet('proj-overlay'); render();
+}
+
+/* ═══════════════════════════════════════
+   PROJECT SUGGESTER UI
+═══════════════════════════════════════ */
+let suggesterProject = null;
+let suggesterTemplate = null;
+let suggesterSelections = {}; // { taskTitle: boolean }
+
+const TEMPLATE_LABELS = {
+  tesis: 'tesis o trabajo de grado', viaje: 'viaje', boda: 'boda',
+  mudanza: 'mudanza', examen: 'estudio/examen', evento: 'evento',
+  lanzamiento: 'lanzamiento de producto',
+};
+
+function openSuggester(proj, template) {
+  suggesterProject = proj;
+  suggesterTemplate = template;
+  suggesterSelections = {};
+
+  const visibleTasks = template.tasks.filter(t => !shouldSuppressSuggestion(template.id, t.title));
+  visibleTasks.forEach(t => { suggesterSelections[t.title] = true; });
+
+  document.getElementById('suggester-proj-name').textContent = proj.name;
+  document.getElementById('suggester-tpl-label').textContent = TEMPLATE_LABELS[template.id] || template.id;
+
+  renderSuggesterList();
+  document.getElementById('suggester-page').classList.add('open');
+  callLucide();
+}
+
+function renderSuggesterList() {
+  const container = document.getElementById('suggester-list');
+  const visibleTasks = suggesterTemplate.tasks.filter(t => !shouldSuppressSuggestion(suggesterTemplate.id, t.title));
+
+  if (!visibleTasks.length) {
+    container.innerHTML = `<div class="empty"><div class="empty-icon"><i data-lucide="sparkles"></i></div><div class="empty-msg">Sin sugerencias disponibles para este tipo de proyecto</div></div>`;
+    callLucide();
+    return;
+  }
+
+  const bySection = {};
+  visibleTasks.forEach(t => {
+    if (!bySection[t.section]) bySection[t.section] = [];
+    bySection[t.section].push(t);
+  });
+
+  let html = '';
+  Object.entries(bySection).forEach(([section, items]) => {
+    html += `<div class="suggester-section-label">${esc(section)}</div>`;
+    items.forEach(item => {
+      const checked = suggesterSelections[item.title];
+      html += `<div class="suggester-item ${checked?'':'unchecked'}" onclick="toggleSuggesterItem('${esc(item.title).replace(/'/g,"\\'")}')">
+        <div class="suggester-item-check ${checked?'checked':''}"></div>
+        <span class="suggester-item-title">${esc(item.title)}</span>
+      </div>`;
+    });
+  });
+  container.innerHTML = html;
+  updateSuggesterConfirmLabel();
+  callLucide();
+}
+
+function toggleSuggesterItem(title) {
+  suggesterSelections[title] = !suggesterSelections[title];
+  renderSuggesterList();
+}
+
+function updateSuggesterConfirmLabel() {
+  const count = Object.values(suggesterSelections).filter(Boolean).length;
+  const btn = document.getElementById('suggester-confirm-btn');
+  btn.innerHTML = count
+    ? `Agregar ${count} tarea${count===1?'':'s'} seleccionada${count===1?'':'s'}`
+    : `Agregar tareas seleccionadas`;
+}
+
+function confirmSuggestions() {
+  const template = suggesterTemplate;
+  const proj = suggesterProject;
+
+  // Create sections for this project (skip if a section with that name already exists, unlikely on a fresh project)
+  const sectionIdByName = {};
+  template.sections.forEach((secName, i) => {
+    const sec = { id: 'sec_'+Date.now()+'_'+i, name: secName, projectId: proj.id, order: i };
+    sections.push(sec);
+    sectionIdByName[secName] = sec.id;
+  });
+
+  let addedCount = 0;
+  template.tasks.forEach(item => {
+    const wasVisible = !shouldSuppressSuggestion(template.id, item.title);
+    const accepted = wasVisible && !!suggesterSelections[item.title];
+    if (wasVisible) recordSuggestionChoice(template.id, item.title, accepted);
+    if (accepted) {
+      tasks.unshift({
+        id: 't'+Date.now()+'_'+addedCount,
+        title: item.title, desc: '', project: proj.id,
+        sectionId: sectionIdByName[item.section] || MY_TASKS_DEFAULT_SECTION,
+        due: '', tag: '', done: false, focusMinutes: 0, subtasks: [],
+        created: Date.now() - addedCount, // preserve relative order
+      });
+      addedCount++;
+    }
+  });
+
+  save();
+  closeSuggester(true);
+  showToast(addedCount ? `✨ ${addedCount} tarea${addedCount===1?'':'s'} agregada${addedCount===1?'':'s'}` : 'Proyecto creado sin tareas sugeridas');
+  render();
+}
+
+function closeSuggester(wasConfirmed) {
+  if (!wasConfirmed && suggesterTemplate) {
+    // User skipped entirely — count every suggested task as rejected for learning purposes.
+    suggesterTemplate.tasks.forEach(item => {
+      if (!shouldSuppressSuggestion(suggesterTemplate.id, item.title)) {
+        recordSuggestionChoice(suggesterTemplate.id, item.title, false);
+      }
+    });
+  }
+  document.getElementById('suggester-page').classList.remove('open');
+  suggesterProject = null;
+  suggesterTemplate = null;
+  suggesterSelections = {};
 }
 
 function deleteProject() {
