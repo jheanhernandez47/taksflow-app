@@ -402,6 +402,24 @@ body{background:var(--bg-base);color:var(--text-1);font-family:-apple-system,Bli
 
 /* TOAST */
 .toast{position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-80px);background:var(--bg-card);border:1px solid var(--border-2);border-radius:var(--radius-md);padding:10px 16px;font-size:13px;color:var(--text-1);box-shadow:0 4px 20px #00000055;z-index:500;white-space:nowrap;transition:transform .3s cubic-bezier(.4,0,.2,1)}
+
+/* TUTORIAL TOOLTIPS */
+.tip-scrim{position:fixed;inset:0;z-index:390;background:#00000055;opacity:0;pointer-events:none;transition:opacity .25s}
+.tip-scrim.active{opacity:1;pointer-events:all}
+.tip-bubble{position:fixed;z-index:400;background:var(--bg-surface);border:1px solid var(--border-2);border-radius:var(--radius-lg);padding:18px 16px 14px;width:min(300px,calc(100vw - 32px));box-shadow:0 8px 32px #00000077;opacity:0;pointer-events:none;transform:scale(.92) translateY(8px);transition:opacity .22s,transform .22s cubic-bezier(.4,0,.2,1)}
+.tip-bubble.active{opacity:1;pointer-events:all;transform:scale(1) translateY(0)}
+.tip-close{position:absolute;top:10px;right:10px;background:none;border:none;color:var(--text-3);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:4px}
+.tip-icon{font-size:28px;margin-bottom:8px}
+.tip-title{font-size:15px;font-weight:700;color:var(--text-1);margin-bottom:6px;line-height:1.3}
+.tip-body{font-size:13px;color:var(--text-2);line-height:1.55;margin-bottom:12px}
+.tip-footer{display:flex;align-items:center;justify-content:space-between}
+.tip-step{font-size:11px;color:var(--text-3)}
+.tip-got-it{background:var(--accent);color:#fff;border:none;border-radius:var(--radius-sm);padding:7px 14px;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s}
+.tip-got-it:active{background:#5750e0;transform:scale(.97)}
+/* Arrow pointing down toward nav bar */
+.tip-arrow{position:absolute;bottom:-9px;width:16px;height:16px;background:var(--bg-surface);border-right:1px solid var(--border-2);border-bottom:1px solid var(--border-2);transform:rotate(45deg);left:50%;margin-left:-8px}
+/* Arrow pointing up toward header */
+.tip-arrow.up{bottom:auto;top:-9px;border-right:none;border-bottom:none;border-left:1px solid var(--border-2);border-top:1px solid var(--border-2)}
 .toast.show{transform:translateX(-50%) translateY(0)}
 
 /* SECTION RENAME INPUT */
@@ -802,6 +820,20 @@ body{background:var(--bg-base);color:var(--text-1);font-family:-apple-system,Bli
   </div>
 </div>
 
+<!-- ── TUTORIAL TOOLTIP ───────────────────── -->
+<div class="tip-scrim" id="tip-scrim" onclick="dismissTip()"></div>
+<div class="tip-bubble" id="tip-bubble">
+  <button class="tip-close" onclick="dismissTip()" aria-label="Cerrar"><i data-lucide="x" class="ico-sm"></i></button>
+  <div class="tip-icon" id="tip-icon"></div>
+  <div class="tip-title" id="tip-title"></div>
+  <div class="tip-body" id="tip-body"></div>
+  <div class="tip-footer">
+    <span class="tip-step" id="tip-step"></span>
+    <button class="tip-got-it" onclick="dismissTip()">Entendido →</button>
+  </div>
+  <div class="tip-arrow" id="tip-arrow"></div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -899,12 +931,156 @@ const COLORS  = ['#6c63ff','#43e97b','#38bdf8','#f472b6','#ffb344','#ff5f6d','#2
 /* ═══════════════════════════════════════
    INIT
 ═══════════════════════════════════════ */
+/* ═══════════════════════════════════════
+   TUTORIAL — contextual tooltips shown
+   once per section on first visit.
+   Stored in localStorage: tf2_tips_seen
+   (a Set of tip IDs that have been shown).
+═══════════════════════════════════════ */
+const TIP_DEFINITIONS = {
+  home: {
+    id: 'home',
+    icon: '🏠',
+    title: '¡Bienvenido a TaskFlow!',
+    body: 'Esta es tu pantalla de Inicio. Verás tus tareas más urgentes, los proyectos que abriste recientemente y las tareas que creaste últimamente — todo de un vistazo.',
+    anchor: 'tab-home',
+    arrowDir: 'down',
+    step: '1 de 4',
+  },
+  tasks: {
+    id: 'tasks',
+    icon: '☑️',
+    title: 'Mis tareas',
+    body: 'Aquí están todas tus tareas personales, agrupadas por secciones. Toca el círculo para marcar una como completada, o los tres puntos ⋮ para ver sus detalles.',
+    anchor: 'tab-tasks',
+    arrowDir: 'down',
+    step: '2 de 4',
+  },
+  projects: {
+    id: 'projects',
+    icon: '📁',
+    title: 'Proyectos',
+    body: 'Organiza tu trabajo en proyectos. Cada uno tiene tres vistas: Lista, Tablero (Kanban) y Resumen. Al crear un proyecto, la app te sugerirá tareas típicas según el tipo que sea.',
+    anchor: 'tab-projects',
+    arrowDir: 'down',
+    step: '3 de 4',
+  },
+  profile: {
+    id: 'profile',
+    icon: '👤',
+    title: 'Tu perfil',
+    body: 'Aquí puedes poner tu foto y nombre, activar notificaciones de vencimiento, y exportar o importar todos tus datos como respaldo.',
+    anchor: 'tab-profile',
+    arrowDir: 'down',
+    step: '4 de 4',
+  },
+};
+
+let tipsSeen = new Set(JSON.parse(localStorage.getItem('tf2_tips_seen') || '[]'));
+
+function saveTipsSeen() {
+  localStorage.setItem('tf2_tips_seen', JSON.stringify([...tipsSeen]));
+}
+
+function shouldShowTip(id) {
+  return !tipsSeen.has(id);
+}
+
+function showTip(id) {
+  const def = TIP_DEFINITIONS[id];
+  if (!def || !shouldShowTip(id)) return;
+
+  // Populate content
+  document.getElementById('tip-icon').textContent  = def.icon;
+  document.getElementById('tip-title').textContent = def.title;
+  document.getElementById('tip-body').textContent  = def.body;
+  document.getElementById('tip-step').textContent  = def.step;
+
+  const arrow = document.getElementById('tip-arrow');
+  arrow.className = 'tip-arrow' + (def.arrowDir === 'up' ? ' up' : '');
+
+  // Position the bubble relative to the anchor element
+  const bubble = document.getElementById('tip-bubble');
+  bubble.style.cssText = ''; // reset inline styles
+
+  // Wait a frame so layout is complete before measuring
+  requestAnimationFrame(() => {
+    const anchor = document.getElementById(def.anchor);
+    if (!anchor) { dismissTip(); return; }
+
+    const aRect   = anchor.getBoundingClientRect();
+    const vw      = window.innerWidth;
+    const vh      = window.innerHeight;
+    const bWidth  = Math.min(300, vw - 32);
+    bubble.style.width = bWidth + 'px';
+
+    // Force layout so we can measure bubble height
+    bubble.style.opacity = '0';
+    bubble.style.transform = 'none';
+    bubble.style.display = 'block';
+    const bHeight = bubble.offsetHeight;
+
+    let top, left, arrowLeft;
+
+    if (def.arrowDir === 'down') {
+      // Bubble appears ABOVE the anchor (tooltip points down to nav)
+      top = aRect.top - bHeight - 14;
+    } else {
+      // Bubble appears BELOW the anchor (tooltip points up)
+      top = aRect.bottom + 14;
+    }
+
+    // Horizontal: center on anchor, clamp to screen edges
+    left = aRect.left + aRect.width / 2 - bWidth / 2;
+    left = Math.max(16, Math.min(left, vw - bWidth - 16));
+
+    // Arrow horizontal offset (relative to bubble left)
+    arrowLeft = (aRect.left + aRect.width / 2) - left - 8;
+    arrowLeft = Math.max(12, Math.min(arrowLeft, bWidth - 28));
+
+    bubble.style.top    = top + 'px';
+    bubble.style.left   = left + 'px';
+    arrow.style.left    = arrowLeft + 'px';
+    arrow.style.marginLeft = '0';
+
+    // Animate in
+    bubble.style.opacity = '';
+    bubble.style.transform = '';
+    bubble.classList.add('active');
+    document.getElementById('tip-scrim').classList.add('active');
+    callLucide();
+  });
+}
+
+function dismissTip() {
+  const bubble = document.getElementById('tip-bubble');
+  const scrim  = document.getElementById('tip-scrim');
+
+  // Which tip is currently shown? Read from visible content.
+  const title = document.getElementById('tip-title').textContent;
+  const def = Object.values(TIP_DEFINITIONS).find(d => d.title === title);
+  if (def) {
+    tipsSeen.add(def.id);
+    saveTipsSeen();
+  }
+
+  bubble.classList.remove('active');
+  scrim.classList.remove('active');
+}
+
+function maybeTriggerTip(id) {
+  if (!shouldShowTip(id)) return;
+  // Slight delay so the page content renders first
+  setTimeout(() => showTip(id), 350);
+}
+
 function init() {
   updateGreeting();
   buildColorPicker();
   updateHeaderAvatar();
   render();
   scheduleNotifications();
+  maybeTriggerTip('home');
 }
 
 function updateGreeting() {
@@ -923,6 +1099,8 @@ function switchTab(tab) {
   document.getElementById('page-'+tab).classList.add('active');
   closeFabMenus();
   render();
+  // Show contextual tip the first time the user visits each section
+  if (TIP_DEFINITIONS[tab]) maybeTriggerTip(tab);
 }
 
 function render() {
@@ -1098,6 +1276,7 @@ function openProfile() {
   updateNotifStatusSub();
   document.getElementById('profile-page').classList.add('open');
   callLucide();
+  maybeTriggerTip('profile');
 }
 
 function closeProfile() {
