@@ -101,7 +101,6 @@ body{background:var(--bg-base);color:var(--text-1);font-family:-apple-system,Bli
 .task-meta{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;align-items:center}
 .meta-pill{display:inline-flex;align-items:center;gap:3px;font-size:11px;padding:2px 7px;border-radius:8px}
 .meta-pill.date{color:var(--warn);background:var(--warn-dim)}
-.meta-pill.tag-pill{color:var(--accent);background:var(--accent-dim)}
 .meta-pill.date.overdue{color:var(--danger);background:var(--danger-dim)}
 .subtask-count{margin-left:auto;font-size:11px;color:var(--text-3)}
 .subtask-bar{height:3px;background:var(--border);border-radius:3px;margin-top:7px;overflow:hidden}
@@ -212,6 +211,22 @@ body{background:var(--bg-base);color:var(--text-1);font-family:-apple-system,Bli
 
 /* INICIO */
 .home-section-label{font-size:11px;font-weight:700;letter-spacing:1px;color:var(--text-3);text-transform:uppercase;margin:20px 0 8px}
+
+/* URGENCY BANNER */
+.alert-banner{border-radius:var(--radius-lg);padding:14px 16px;margin-bottom:16px;display:flex;gap:12px;align-items:flex-start;cursor:pointer;transition:opacity .15s}
+.alert-banner:active{opacity:.8}
+.alert-banner.level-overdue{background:#3a0a0e;border:1px solid var(--danger)}
+.alert-banner.level-today{background:#2a1e00;border:1px solid var(--warn)}
+.alert-banner.level-tomorrow{background:#0d2a1a;border:1px solid var(--success)}
+.alert-banner-icon{font-size:22px;flex-shrink:0;margin-top:1px}
+.alert-banner-body{flex:1;min-width:0}
+.alert-banner-title{font-size:14px;font-weight:700;margin-bottom:3px}
+.alert-banner.level-overdue .alert-banner-title{color:var(--danger)}
+.alert-banner.level-today .alert-banner-title{color:var(--warn)}
+.alert-banner.level-tomorrow .alert-banner-title{color:var(--success)}
+.alert-banner-sub{font-size:12px;color:var(--text-2);line-height:1.4}
+.alert-banner-tasks{margin-top:8px;display:flex;flex-direction:column;gap:4px}
+.alert-banner-task{font-size:12px;color:var(--text-1);background:#ffffff0d;padding:5px 9px;border-radius:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .home-section-label:first-child{margin-top:0}
 .home-recent-proj-scroll{display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
 .home-recent-proj-scroll::-webkit-scrollbar{display:none}
@@ -328,14 +343,6 @@ body{background:var(--bg-base);color:var(--text-1);font-family:-apple-system,Bli
 /* FORM */
 .field{margin-bottom:14px}
 .field label{display:block;font-size:12px;font-weight:600;color:var(--text-2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px}
-.nlp-hint-label{text-transform:none;font-weight:400;letter-spacing:0;color:var(--text-3);font-size:11px}
-.nlp-preview{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;min-height:0}
-.nlp-chip{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:4px 9px;border-radius:12px;animation:nlpPop .18s ease-out}
-.nlp-chip.nlp-date{background:var(--warn-dim);color:var(--warn)}
-.nlp-chip.nlp-project{background:#0c2a3d;color:var(--blue)}
-.nlp-chip.nlp-project.nlp-project-new{background:var(--bg-input);color:var(--text-3);border:1px dashed var(--border-2)}
-.nlp-chip.nlp-tag{background:var(--accent-dim);color:var(--accent)}
-@keyframes nlpPop{from{transform:scale(.8);opacity:0}to{transform:scale(1);opacity:1}}
 .field input,.field textarea,.field select{width:100%;background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-1);font-size:14px;padding:10px 12px;outline:none;font-family:inherit;transition:border-color .15s}
 .field input:focus,.field textarea:focus,.field select:focus{border-color:var(--accent)}
 .field textarea{resize:none;min-height:80px}
@@ -355,8 +362,6 @@ body{background:var(--bg-base);color:var(--text-1);font-family:-apple-system,Bli
 .btn-danger{background:var(--danger-dim);color:var(--danger);border:1px solid var(--danger)}
 
 /* EMOJI / COLOR PICKERS */
-.emoji-grid{display:flex;gap:8px;flex-wrap:wrap}
-.emoji-opt{font-size:24px;padding:6px;border-radius:8px;cursor:pointer;border:2px solid transparent;transition:.15s}
 .color-opt{width:28px;height:28px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:.15s}
 
 /* DETAIL PAGE */
@@ -421,6 +426,8 @@ body{background:var(--bg-base);color:var(--text-1);font-family:-apple-system,Bli
 
   <!-- INICIO -->
   <div id="page-home" class="page active">
+    <div id="home-alert-banner"></div>
+
     <div class="home-section-label">Próximas a vencer</div>
     <div id="home-upcoming-list"></div>
 
@@ -728,11 +735,7 @@ body{background:var(--bg-base);color:var(--text-1);font-family:-apple-system,Bli
     <div class="sheet-handle"></div>
     <div class="sheet-title" id="sheet-title">Nueva tarea</div>
     <div class="sheet-body">
-      <div class="field">
-        <label>Título * <span class="nlp-hint-label">— escribe en lenguaje natural</span></label>
-        <input type="text" id="f-title" placeholder="ej. Entregar informe mañana 6pm #Escuela @Urgente" oninput="parseTitleNLP()" autocomplete="off">
-        <div class="nlp-preview" id="nlp-preview"></div>
-      </div>
+      <div class="field"><label>Título *</label><input type="text" id="f-title" placeholder="¿Qué necesitas hacer?" autocomplete="off"></div>
       <div class="field"><label>Descripción</label><textarea id="f-desc" placeholder="Detalles opcionales..."></textarea></div>
       <div style="display:flex;gap:10px">
         <div class="field" style="flex:1">
@@ -746,10 +749,7 @@ body{background:var(--bg-base);color:var(--text-1);font-family:-apple-system,Bli
           <select id="f-section"><option value="">Tareas recientes</option></select>
         </div>
       </div>
-      <div style="display:flex;gap:10px">
-        <div class="field" style="flex:1"><label>Fecha límite</label><input type="datetime-local" id="f-due"></div>
-        <div class="field" style="flex:1"><label>Etiqueta</label><input type="text" id="f-tag" placeholder="ej. Urgente" maxlength="20"></div>
-      </div>
+      <div class="field"><label>Fecha límite</label><input type="datetime-local" id="f-due"></div>
       <div class="field">
         <label>Subtareas</label>
         <div class="subtask-input-row">
@@ -774,10 +774,6 @@ body{background:var(--bg-base);color:var(--text-1);font-family:-apple-system,Bli
     <div class="sheet-title" id="proj-sheet-title">Nuevo proyecto</div>
     <div class="sheet-body">
       <div class="field"><label>Nombre *</label><input type="text" id="pf-name" placeholder="Nombre del proyecto"></div>
-      <div class="field">
-        <label>Ícono</label>
-        <div class="emoji-grid" id="emoji-picker"></div>
-      </div>
       <div class="field">
         <label>Color</label>
         <div style="display:flex;gap:8px;flex-wrap:wrap" id="color-picker"></div>
@@ -890,7 +886,6 @@ let currentTab       = 'home';
 let activeFilter     = 'all';
 let editingTaskId    = null;
 let formSubtasks     = [];
-let selectedEmoji    = '📋';
 let selectedColor    = '#6c63ff';
 let currentDetailId  = null;
 let currentProjectId = null;
@@ -899,7 +894,6 @@ let editingProjId    = null;
 let editingSectionId = null;  // for section sheet
 let sectionTargetProjId = null;
 
-const EMOJIS = ['📋','🎯','🚀','💡','📚','💼','🌱','🏋️','🎨','🔬','🛠','📱','💰','✈️','🎵','🧠','⚡','🔑'];
 const COLORS  = ['#6c63ff','#43e97b','#38bdf8','#f472b6','#ffb344','#ff5f6d','#2dd4bf','#a78bfa','#fb923c'];
 
 /* ═══════════════════════════════════════
@@ -907,7 +901,6 @@ const COLORS  = ['#6c63ff','#43e97b','#38bdf8','#f472b6','#ffb344','#ff5f6d','#2
 ═══════════════════════════════════════ */
 function init() {
   updateGreeting();
-  buildEmojiPicker();
   buildColorPicker();
   updateHeaderAvatar();
   render();
@@ -1650,7 +1643,6 @@ function taskCardHTML(t) {
       <div class="task-meta">
         ${proj?`<span style="font-size:11px;color:${proj.color};background:${proj.color}22;padding:2px 7px;border-radius:8px">${proj.icon} ${esc(proj.name)}</span>`:''}
         ${dueStr?`<span class="meta-pill date ${isDue&&!t.done?'overdue':''}"><i data-lucide="calendar" class="ico-sm"></i> ${dueStr}</span>`:''}
-        ${t.tag?`<span class="meta-pill tag-pill"><i data-lucide="tag" class="ico-sm"></i> ${esc(t.tag)}</span>`:''}
         ${t.subtasks.length?`<span class="subtask-count">${dc}/${t.subtasks.length} sub</span>`:''}
       </div>
       ${t.subtasks.length?`<div class="subtask-bar"><div class="subtask-fill" style="width:${pct}%"></div></div>`:''}
@@ -1662,7 +1654,72 @@ function taskCardHTML(t) {
 /* ═══════════════════════════════════════
    TODAY
 ═══════════════════════════════════════ */
+/* ═══════════════════════════════════════
+   URGENCY BANNER (shown on Home screen)
+   Priority: overdue > due today > due tomorrow
+═══════════════════════════════════════ */
+function renderUrgencyBanner() {
+  const container = document.getElementById('home-alert-banner');
+  if (!container) return;
+
+  const now = new Date();
+  const todayEnd = new Date(now); todayEnd.setHours(23,59,59,999);
+  const tomorrowEnd = new Date(now); tomorrowEnd.setDate(tomorrowEnd.getDate()+1); tomorrowEnd.setHours(23,59,59,999);
+
+  const pending = tasks.filter(t => !t.done && t.due);
+  const overdue   = pending.filter(t => new Date(t.due) < now);
+  const dueToday  = pending.filter(t => { const d=new Date(t.due); return d>=now && d<=todayEnd; });
+  const dueTomorrow = pending.filter(t => { const d=new Date(t.due); return d>todayEnd && d<=tomorrowEnd; });
+
+  let level, icon, title, sub, taskList;
+
+  if (overdue.length) {
+    level = 'overdue';
+    icon = '🔴';
+    title = `${overdue.length} tarea${overdue.length>1?'s':''} vencida${overdue.length>1?'s':''}`;
+    sub = 'Estas tareas ya pasaron su fecha límite';
+    taskList = overdue;
+  } else if (dueToday.length) {
+    level = 'today';
+    icon = '🟡';
+    title = `${dueToday.length} tarea${dueToday.length>1?'s':''} para hoy`;
+    sub = dueToday.length === 1
+      ? `Vence a las ${formatTime(new Date(dueToday[0].due))}`
+      : `La más próxima vence a las ${formatTime(new Date(dueToday.sort((a,b)=>new Date(a.due)-new Date(b.due))[0].due))}`;
+    taskList = dueToday;
+  } else if (dueTomorrow.length) {
+    level = 'tomorrow';
+    icon = '🟢';
+    title = `${dueTomorrow.length} tarea${dueTomorrow.length>1?'s':''} para mañana`;
+    sub = 'Recuerda organizarte con tiempo';
+    taskList = dueTomorrow;
+  } else {
+    container.innerHTML = '';
+    return;
+  }
+
+  const preview = taskList.slice(0,3);
+  container.innerHTML = `
+    <div class="alert-banner level-${level}" onclick="switchTab('tasks')">
+      <div class="alert-banner-icon">${icon}</div>
+      <div class="alert-banner-body">
+        <div class="alert-banner-title">${title}</div>
+        <div class="alert-banner-sub">${sub}</div>
+        <div class="alert-banner-tasks">
+          ${preview.map(t=>`<div class="alert-banner-task">${esc(t.title)}</div>`).join('')}
+          ${taskList.length>3?`<div class="alert-banner-task" style="color:var(--text-3)">+${taskList.length-3} más...</div>`:''}
+        </div>
+      </div>
+    </div>`;
+}
+
+function formatTime(d) {
+  return d.toLocaleTimeString('es', { hour:'2-digit', minute:'2-digit' });
+}
+
 function renderHome() {
+  renderUrgencyBanner();
+
   // 1. Próximas a vencer — soonest-due pending tasks first, across all tasks
   const upcoming = tasks
     .filter(t => !t.done && t.due)
@@ -1745,7 +1802,6 @@ function openDetail(id) {
         ${proj?`<div style="background:var(--bg-card);padding:10px;border-radius:var(--radius-sm)"><div style="font-size:11px;color:var(--text-3);margin-bottom:3px">PROYECTO</div><div style="font-size:13px;color:${proj.color}">${proj.icon} ${esc(proj.name)}</div></div>`:''}
         ${sec?`<div style="background:var(--bg-card);padding:10px;border-radius:var(--radius-sm)"><div style="font-size:11px;color:var(--text-3);margin-bottom:3px">SECCIÓN</div><div style="font-size:13px">${esc(sec.name)}</div></div>`:''}
         <div style="background:var(--bg-card);padding:10px;border-radius:var(--radius-sm)"><div style="font-size:11px;color:var(--text-3);margin-bottom:3px">FECHA LÍMITE</div><div style="font-size:13px;color:${isDue&&!t.done?'var(--danger)':'var(--text-1)'}">${t.due?formatDateTime(new Date(t.due)):'Sin fecha'}</div></div>
-        ${t.tag?`<div style="background:var(--bg-card);padding:10px;border-radius:var(--radius-sm)"><div style="font-size:11px;color:var(--text-3);margin-bottom:3px">ETIQUETA</div><div style="font-size:13px;color:var(--accent)">🏷 ${esc(t.tag)}</div></div>`:''}
       </div>
     </div>
     ${t.subtasks.length?`
@@ -2042,6 +2098,10 @@ const PROJECT_TEMPLATES = [
   },
 ];
 
+function stripAccents(s) {
+  return (s||'').normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+}
+
 function normalizeForMatch(s) {
   return stripAccents((s||'').toLowerCase()).trim();
 }
@@ -2088,202 +2148,16 @@ function shouldSuppressSuggestion(templateId, taskTitle) {
   return stat.rejected >= 3 && stat.rejected > stat.accepted;
 }
 
-/* ═══════════════════════════════════════
-   NATURAL LANGUAGE PARSER
-   Detects, while typing a task title:
-   - Relative Spanish dates (mañana, el viernes,
-     en 3 días, próximo lunes, hoy, pasado mañana...)
-   - #Proyecto hashtags → matched against existing
-     projects by name (case/accent-insensitive),
-     or offered as "create new" if no match.
-   - @Etiqueta mentions → free-text tag.
-   Everything runs locally, no network calls.
-═══════════════════════════════════════ */
-const WEEKDAYS_ES = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
-// Accent-insensitive aliases so "miercoles" also matches "miércoles"
-const WEEKDAY_ALIASES = {
-  'domingo':0,'lunes':1,'martes':2,'miercoles':3,'miércoles':3,
-  'jueves':4,'viernes':5,'sabado':6,'sábado':6
-};
-
-function stripAccents(s) {
-  return s.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-}
-
-/**
- * Scans free text for the first recognizable relative-date expression.
- * Returns { date: Date, matchText: string, matchIndex: number } or null.
- * Time defaults to 23:59 unless an explicit hour is found (e.g. "6pm", "18:00").
- */
-function parseRelativeDateES(text) {
-  const lower = stripAccents(text.toLowerCase());
-
-  // Captures the connector ("a las"/"a la") together with the time itself,
-  // so phrases like "mañana a las 6pm" get fully removed from the clean title.
-  const timeRegex = /\b(?:a\s+las?\s+)?(\d{1,2})(?::(\d{2}))?\s*(am|pm)\b|\b(?:a\s+las?\s+)?(\d{1,2}):(\d{2})\b/;
-  function extractTime(str) {
-    const m = str.match(timeRegex);
-    if (!m) return null;
-    if (m[1]) {
-      let h = parseInt(m[1], 10);
-      const min = m[2] ? parseInt(m[2], 10) : 0;
-      const ampm = m[3];
-      if (ampm === 'pm' && h < 12) h += 12;
-      if (ampm === 'am' && h === 12) h = 0;
-      return { h, min, matchIndex: m.index, matchLength: m[0].length };
-    } else {
-      return { h: parseInt(m[4],10), min: parseInt(m[5],10), matchIndex: m.index, matchLength: m[0].length };
-    }
-  }
-
-  const patterns = [
-    { re: /\bpasado\s*manana\b/, resolve: () => { const d=new Date(); d.setDate(d.getDate()+2); return d; } },
-    { re: /\bmanana\b/,          resolve: () => { const d=new Date(); d.setDate(d.getDate()+1); return d; } },
-    { re: /\bhoy\b/,             resolve: () => new Date() },
-    { re: /\ben\s+(\d{1,2})\s+dias?\b/, resolve: (m) => { const d=new Date(); d.setDate(d.getDate()+parseInt(m[1],10)); return d; } },
-    { re: /\b(proximo|esta)\s+(domingo|lunes|martes|miercoles|jueves|viernes|sabado)\b/,
-      resolve: (m) => {
-        const target = WEEKDAY_ALIASES[m[2]];
-        const d = new Date();
-        const cur = d.getDay();
-        let diff = (target - cur + 7) % 7;
-        // "esta" means the soonest occurrence (today counts as 0 days away);
-        // "próximo" always means next week's occurrence, even if today matches.
-        if (m[1] === 'proximo' && diff === 0) diff = 7;
-        d.setDate(d.getDate() + diff);
-        return d;
-      }
-    },
-    { re: /\bel\s+(domingo|lunes|martes|miercoles|jueves|viernes|sabado)\b/,
-      resolve: (m) => {
-        const target = WEEKDAY_ALIASES[m[1]];
-        const d = new Date();
-        const cur = d.getDay();
-        let diff = (target - cur + 7) % 7;
-        if (diff === 0) diff = 7;
-        d.setDate(d.getDate() + diff);
-        return d;
-      }
-    },
-  ];
-
-  for (const p of patterns) {
-    const m = lower.match(p.re);
-    if (m) {
-      const date = p.resolve(m);
-      const time = extractTime(lower);
-      const spans = [{ index: m.index, length: m[0].length }];
-      if (time) {
-        date.setHours(time.h, time.min, 0, 0);
-        spans.push({ index: time.matchIndex, length: time.matchLength });
-      } else {
-        date.setHours(23, 59, 0, 0);
-      }
-      return { date, spans };
-    }
-  }
-  return null;
-}
-
-/**
- * Parses #project and @tag tokens out of the raw input.
- * Returns { projectMatch, tagText, cleanedOfTokens }.
- * projectMatch is either an existing project object, or
- * { isNew: true, name } if no existing project matches.
- */
-function parseHashtagsAndMentions(text) {
-  const hashMatch = text.match(/#([^\s#@]+)/);
-  const atMatch = text.match(/@([^\s#@]+)/);
-
-  let projectMatch = null;
-  if (hashMatch) {
-    const raw = hashMatch[1];
-    const normalized = stripAccents(raw.toLowerCase());
-    const existing = projects.find(p => stripAccents(p.name.toLowerCase()) === normalized || stripAccents(p.name.toLowerCase()).includes(normalized));
-    projectMatch = existing ? existing : { isNew: true, name: raw };
-  }
-
-  return {
-    projectMatch,
-    tagText: atMatch ? atMatch[1] : null,
-    hashSpan: hashMatch ? { index: hashMatch.index, length: hashMatch[0].length } : null,
-    atSpan: atMatch ? { index: atMatch.index, length: atMatch[0].length } : null,
-  };
-}
-
-/**
- * Master parse: runs date + hashtag/mention detection, and returns
- * a cleaned title with all recognized tokens stripped out.
- */
-function parseTaskInput(rawText) {
-  const dateResult = parseRelativeDateES(rawText);
-  const tagResult = parseHashtagsAndMentions(rawText);
-
-  // Remove all recognized spans from the text to produce a clean title.
-  const spans = [];
-  if (dateResult) spans.push(...dateResult.spans);
-  if (tagResult.hashSpan) spans.push(tagResult.hashSpan);
-  if (tagResult.atSpan) spans.push(tagResult.atSpan);
-  spans.sort((a,b) => b.index - a.index); // remove from the end so indices stay valid
-
-  let cleanTitle = rawText;
-  for (const span of spans) {
-    cleanTitle = cleanTitle.slice(0, span.index) + cleanTitle.slice(span.index + span.length);
-  }
-  cleanTitle = cleanTitle.replace(/\s+/g, ' ').trim();
-
-  return {
-    cleanTitle,
-    date: dateResult ? dateResult.date : null,
-    projectMatch: tagResult.projectMatch,
-    tagText: tagResult.tagText,
-  };
-}
-
-let nlpParseResult = null;
-
-function parseTitleNLP() {
-  const raw = document.getElementById('f-title').value;
-  nlpParseResult = parseTaskInput(raw);
-  renderNLPPreview();
-}
-
-function renderNLPPreview() {
-  const container = document.getElementById('nlp-preview');
-  if (!nlpParseResult || (!nlpParseResult.date && !nlpParseResult.projectMatch && !nlpParseResult.tagText)) {
-    container.innerHTML = '';
-    return;
-  }
-  let html = '';
-  if (nlpParseResult.date) {
-    html += `<span class="nlp-chip nlp-date"><i data-lucide="calendar" class="ico-sm"></i> ${formatDate(nlpParseResult.date)}</span>`;
-  }
-  if (nlpParseResult.projectMatch) {
-    if (nlpParseResult.projectMatch.isNew) {
-      html += `<span class="nlp-chip nlp-project nlp-project-new"><i data-lucide="plus-circle" class="ico-sm"></i> Crear "${esc(nlpParseResult.projectMatch.name)}"</span>`;
-    } else {
-      html += `<span class="nlp-chip nlp-project">${nlpParseResult.projectMatch.icon} ${esc(nlpParseResult.projectMatch.name)}</span>`;
-    }
-  }
-  if (nlpParseResult.tagText) {
-    html += `<span class="nlp-chip nlp-tag"><i data-lucide="tag" class="ico-sm"></i> ${esc(nlpParseResult.tagText)}</span>`;
-  }
-  container.innerHTML = html;
-  callLucide();
-}
 
 /* ═══════════════════════════════════════
    TASK CRUD
 ═══════════════════════════════════════ */
 function openNewTask(projId, sectionId) {
   editingTaskId=null; formSubtasks=[];
-  nlpParseResult = null;
   document.getElementById('sheet-title').textContent='Nueva tarea';
   document.getElementById('f-title').value='';
   document.getElementById('f-desc').value='';
   document.getElementById('f-due').value='';
-  document.getElementById('f-tag').value='';
-  document.getElementById('nlp-preview').innerHTML='';
   document.getElementById('delete-btn').style.display='none';
   document.getElementById('subtask-list').innerHTML='';
   populateProjectSelect(projId||'');
@@ -2295,13 +2169,10 @@ function openNewTask(projId, sectionId) {
 function openEditTask(id) {
   const t=tasks.find(x=>x.id===id); if(!t) return;
   editingTaskId=id; formSubtasks=t.subtasks.map(s=>({...s}));
-  nlpParseResult = null;
   document.getElementById('sheet-title').textContent='Editar tarea';
   document.getElementById('f-title').value=t.title;
   document.getElementById('f-desc').value=t.desc||'';
   document.getElementById('f-due').value=t.due?t.due.slice(0,16):'';
-  document.getElementById('f-tag').value=t.tag||'';
-  document.getElementById('nlp-preview').innerHTML='';
   document.getElementById('delete-btn').style.display='flex';
   populateProjectSelect(t.project||'');
   populateSectionSelect(t.project||'', t.sectionId||'');
@@ -2310,42 +2181,17 @@ function openEditTask(id) {
 }
 
 function saveTask() {
-  const rawTitle = document.getElementById('f-title').value.trim();
-  if(!rawTitle){showToast('⚠ El título es obligatorio');return;}
-
-  const parsed = parseTaskInput(rawTitle);
-  const title = parsed.cleanTitle || rawTitle;
-
-  const dueVal = document.getElementById('f-due').value;
-  let projId = document.getElementById('f-project').value;
-  const manualTag = document.getElementById('f-tag').value.trim();
-
-  // NLP-detected values only fill in fields the user left empty —
-  // explicit form fields always win if the user set them.
-  let due = dueVal ? new Date(dueVal).toISOString() : '';
-  if (!due && parsed.date) due = parsed.date.toISOString();
-
-  let tag = manualTag;
-  if (!tag && parsed.tagText) tag = parsed.tagText;
-
-  if (!projId && parsed.projectMatch) {
-    if (parsed.projectMatch.isNew) {
-      const newProj = { id:'p'+Date.now(), name: parsed.projectMatch.name, icon:'📋', color:'#6c63ff', created: Date.now() };
-      projects.push(newProj);
-      projId = newProj.id;
-      showToast(`📁 Proyecto "${parsed.projectMatch.name}" creado`);
-    } else {
-      projId = parsed.projectMatch.id;
-    }
-  }
-
+  const title=document.getElementById('f-title').value.trim();
+  if(!title){showToast('⚠ El título es obligatorio');return;}
+  const dueVal=document.getElementById('f-due').value;
+  const projId=document.getElementById('f-project').value;
   let secId=document.getElementById('f-section').value;
   if(!secId) secId=MY_TASKS_DEFAULT_SECTION;
   const task={
     id:editingTaskId||'t'+Date.now(),
     title,desc:document.getElementById('f-desc').value.trim(),
     project:projId, sectionId:secId,
-    due, tag,
+    due:dueVal?new Date(dueVal).toISOString():'',
     done:editingTaskId?tasks.find(t=>t.id===editingTaskId)?.done||false:false,
     focusMinutes:editingTaskId?tasks.find(t=>t.id===editingTaskId)?.focusMinutes||0:0,
     subtasks:formSubtasks,
@@ -2354,7 +2200,6 @@ function saveTask() {
   if(editingTaskId){tasks=tasks.map(t=>t.id===editingTaskId?task:t);showToast('✏ Tarea actualizada');}
   else{tasks.unshift(task);showToast('✅ Tarea creada');}
   save(); closeSheet('task-overlay');
-  nlpParseResult = null;
   if(currentProjectId) renderProjectView(currentProjView); else render();
   scheduleNotifications();
 }
@@ -2418,8 +2263,8 @@ function openNewProject() {
   document.getElementById('proj-sheet-title').textContent='Nuevo proyecto';
   document.getElementById('pf-name').value='';
   document.getElementById('delete-proj-btn').style.display='none';
-  selectedEmoji='📋'; selectedColor='#6c63ff';
-  buildEmojiPicker(); buildColorPicker();
+  selectedColor='#6c63ff';
+  buildColorPicker();
   openSheet('proj-overlay');
 }
 
@@ -2429,8 +2274,8 @@ function openEditProject(id) {
   document.getElementById('proj-sheet-title').textContent='Editar proyecto';
   document.getElementById('pf-name').value=p.name;
   document.getElementById('delete-proj-btn').style.display='flex';
-  selectedEmoji=p.icon; selectedColor=p.color;
-  buildEmojiPicker(); buildColorPicker();
+  selectedColor=p.color;
+  buildColorPicker();
   openSheet('proj-overlay');
 }
 
@@ -2438,16 +2283,17 @@ function saveProject() {
   const name=document.getElementById('pf-name').value.trim();
   if(!name){showToast('⚠ Nombre requerido');return;}
   if(editingProjId){
-    projects=projects.map(p=>p.id===editingProjId?{...p,name,icon:selectedEmoji,color:selectedColor}:p);
+    projects=projects.map(p=>p.id===editingProjId?{...p,name,icon:p.icon||'📋',color:selectedColor}:p);
     showToast('✏ Proyecto actualizado');
     // Update project detail header if open
     if(currentProjectId===editingProjId){
-      document.getElementById('pd-title').textContent=selectedEmoji+' '+name;
+      const icon = projects.find(p=>p.id===editingProjId)?.icon||'📁';
+      document.getElementById('pd-title').textContent=icon+' '+name;
       document.getElementById('pd-progress-fill').style.background=selectedColor;
     }
     save(); closeSheet('proj-overlay'); render();
   } else {
-    const newProj = {id:'p'+Date.now(),name,icon:selectedEmoji,color:selectedColor,created:Date.now()};
+    const newProj = {id:'p'+Date.now(),name,icon:'📁',color:selectedColor,created:Date.now()};
     projects.push(newProj);
     save(); closeSheet('proj-overlay'); render();
     showToast('📁 Proyecto creado');
@@ -2628,11 +2474,6 @@ function renderFormSubtasks(){document.getElementById('subtask-list').innerHTML=
 /* ═══════════════════════════════════════
    PICKERS
 ═══════════════════════════════════════ */
-function buildEmojiPicker() {
-  document.getElementById('emoji-picker').innerHTML=EMOJIS.map(e=>
-    `<div onclick="selectEmoji('${e}')" class="emoji-opt" style="border-color:${e===selectedEmoji?'var(--accent)':'transparent'}">${e}</div>`).join('');
-}
-function selectEmoji(e){selectedEmoji=e;buildEmojiPicker();}
 function buildColorPicker() {
   document.getElementById('color-picker').innerHTML=COLORS.map(c=>
     `<div onclick="selectColor('${c}')" class="color-opt" style="background:${c};border-color:${c===selectedColor?'#fff':'transparent'}"></div>`).join('');
@@ -2650,10 +2491,63 @@ function closeSheet(id){document.getElementById(id).classList.remove('open');}
 ═══════════════════════════════════════ */
 function scheduleNotifications(){
   if(!('Notification' in window) || Notification.permission!=='granted') return;
-  const now=new Date();
-  tasks.filter(t=>!t.done&&t.due).forEach(t=>{
-    const due=new Date(t.due),diff=due-now;
-    if(diff>0&&diff<=3600000) setTimeout(()=>new Notification('⏰ Tarea próxima a vencer',{body:t.title,icon:'icon-192.png',tag:t.id}),Math.max(0,diff-600000));
+
+  // Cancel any previously scheduled notifications by clearing tracked timers
+  if (window._pomoNotifTimers) window._pomoNotifTimers.forEach(clearTimeout);
+  window._pomoNotifTimers = [];
+
+  const now = new Date();
+  const in24h = new Date(now.getTime() + 24*60*60*1000);
+
+  const pending = tasks.filter(t => !t.done && t.due);
+
+  pending.forEach(t => {
+    const due = new Date(t.due);
+    const diff = due - now; // ms until due
+
+    if (diff <= 0) {
+      // Already overdue — fire an immediate notification (once per session)
+      if (!t._notifiedOverdue) {
+        const timer = setTimeout(() => {
+          new Notification('🔴 Tarea vencida', {
+            body: t.title + '\nVenció: ' + formatDateTime(due),
+            icon: 'icon-192.png',
+            tag: 'overdue_' + t.id,
+          });
+        }, 1000); // slight delay so app finishes loading
+        window._pomoNotifTimers.push(timer);
+      }
+      return;
+    }
+
+    if (diff > in24h - now) return; // beyond 24h, skip
+
+    // Schedule notifications at strategic intervals before due time
+    const schedule = [];
+
+    if (diff > 60 * 60 * 1000) {
+      // Notify 1 hour before
+      schedule.push({ fireAt: diff - 60*60*1000, label: 'Vence en 1 hora' });
+    }
+    if (diff > 15 * 60 * 1000) {
+      // Notify 15 minutes before
+      schedule.push({ fireAt: diff - 15*60*1000, label: 'Vence en 15 minutos' });
+    }
+    if (diff > 0) {
+      // Notify exactly at due time
+      schedule.push({ fireAt: diff, label: '¡Hora límite ahora!' });
+    }
+
+    schedule.forEach(({ fireAt, label }) => {
+      const timer = setTimeout(() => {
+        new Notification('⏰ ' + label, {
+          body: t.title,
+          icon: 'icon-192.png',
+          tag: t.id + '_' + label,
+        });
+      }, fireAt);
+      window._pomoNotifTimers.push(timer);
+    });
   });
 }
 
