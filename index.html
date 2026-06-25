@@ -146,6 +146,11 @@ body{background:var(--bg-base);color:var(--text-1);font-family:-apple-system,Bli
 .proj-list-item:hover,.proj-list-item.active{background:var(--bg-card)}
 .proj-list-item.active{border-left:3px solid var(--accent)}
 .proj-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.proj-lucide-icon{width:15px;height:15px;flex-shrink:0}
+.proj-pill{display:inline-flex;align-items:center;gap:4px;font-size:11px;padding:2px 7px;border-radius:8px}
+.proj-pill .proj-lucide-icon{width:11px;height:11px}
+.home-proj-card-icon .proj-lucide-icon{width:22px;height:22px}
+#pd-title .proj-lucide-icon{width:18px;height:18px;vertical-align:middle}
 .proj-list-name{font-size:14px;font-weight:500;flex:1}
 .proj-list-count{font-size:12px;color:var(--text-3)}
 
@@ -909,8 +914,8 @@ const MY_TASKS_DEFAULT_SECTION = '__recent__';
 /* ── SEED ── */
 if (!tasks.length) {
   projects = [
-    {id:'p1',name:'Trabajo',icon:'💼',color:'#6c63ff',created:Date.now()},
-    {id:'p2',name:'Personal',icon:'🌱',color:'#43e97b',created:Date.now()},
+    {id:'p1',name:'Trabajo',icon:'folder',color:'#2080c0',created:Date.now()},
+    {id:'p2',name:'Personal',icon:'folder',color:'#2080c0',created:Date.now()},
   ];
   sections = [
     {id:'sec_p1_1',name:'En progreso',projectId:'p1',order:0},
@@ -1559,6 +1564,16 @@ function toggleSection(id) {
 /* ═══════════════════════════════════════
    PROJECTS LIST
 ═══════════════════════════════════════ */
+
+function projIconHTML(icon) {
+  // Lucide icon names are lowercase with hyphens (no spaces/emoji)
+  if (icon && /^[a-z0-9-]+$/.test(icon)) {
+    return `<i data-lucide="${icon}" class="proj-lucide-icon"></i>`;
+  }
+  // Fallback: render as emoji/text
+  return `<span>${icon||'📁'}</span>`;
+}
+
 function renderProjects() {
   const container = document.getElementById('projects-list');
   if(!projects.length) {
@@ -1570,7 +1585,7 @@ function renderProjects() {
     const done= pts.filter(t=>t.done).length;
     return `<div class="proj-list-item" onclick="openProjectDetail('${p.id}')">
       <div class="proj-dot" style="background:${p.color}"></div>
-      <span class="proj-list-name">${p.icon} ${esc(p.name)}</span>
+      <span class="proj-list-name">${projIconHTML(p.icon)} ${esc(p.name)}</span>
       <span class="proj-list-count">${pts.length-done} pendientes</span>
       <span style="color:var(--text-3);display:flex"><i data-lucide="chevron-right" class="ico-md"></i></span>
     </div>`;
@@ -1589,7 +1604,7 @@ function openProjectDetail(projId) {
   trackProjectView(projId);
 
   // Header
-  document.getElementById('pd-title').textContent = proj.icon+' '+proj.name;
+  document.getElementById('pd-title').innerHTML = projIconHTML(proj.icon)+' '+esc(proj.name);
   const pts  = tasks.filter(t=>t.project===projId);
   const done = pts.filter(t=>t.done).length;
   const pct  = pts.length ? Math.round(done/pts.length*100) : 0;
@@ -1838,7 +1853,7 @@ function taskCardHTML(t) {
       <div class="task-title ${t.done?'done':''}">${esc(t.title)}</div>
       ${t.desc?`<div class="task-desc">${esc(t.desc)}</div>`:''}
       <div class="task-meta">
-        ${proj?`<span style="font-size:11px;color:${proj.color};background:${proj.color}22;padding:2px 7px;border-radius:8px">${proj.icon} ${esc(proj.name)}</span>`:''}
+        ${proj?`<span class="proj-pill" style="color:${proj.color};background:${proj.color}22">${projIconHTML(proj.icon)} ${esc(proj.name)}</span>`:''}
         ${dueStr?`<span class="meta-pill date ${isDue&&!t.done?'overdue':''}"><i data-lucide="calendar" class="ico-sm"></i> ${dueStr}</span>`:''}
         ${t.subtasks.length?`<span class="subtask-count">${dc}/${t.subtasks.length} sub</span>`:''}
       </div>
@@ -1936,7 +1951,7 @@ function renderHome() {
       const pts = tasks.filter(t=>t.project===p.id);
       const done = pts.filter(t=>t.done).length;
       return `<div class="home-proj-card" onclick="openProjectDetail('${p.id}')">
-        <div class="home-proj-card-icon" style="background:${p.color}22">${p.icon}</div>
+        <div class="home-proj-card-icon" style="background:${p.color}22">${projIconHTML(p.icon)}</div>
         <div class="home-proj-card-name">${esc(p.name)}</div>
         <div class="home-proj-card-sub">${pts.length-done} pendientes</div>
       </div>`;
@@ -1966,7 +1981,7 @@ function renderStats() {
   const projStats=projects.map(p=>{const pts=tasks.filter(t=>t.project===p.id);const d=pts.filter(t=>t.done).length;return{p,n:pts.length,d};});
   document.getElementById('proj-stats').innerHTML=projStats.map(({p,n,d})=>`
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
-      <span style="font-size:20px">${p.icon}</span>
+      <span style="font-size:20px;display:flex">${projIconHTML(p.icon)}</span>
       <span style="font-size:13px;flex:1">${esc(p.name)}</span>
       <div style="flex:2;background:var(--border);border-radius:4px;height:5px;overflow:hidden">
         <div style="height:100%;background:${p.color};width:${n?Math.round(d/n*100):0}%;border-radius:4px"></div>
@@ -1996,7 +2011,7 @@ function openDetail(id) {
     <div class="detail-section">
       <div class="detail-sec-title">Detalles</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-        ${proj?`<div style="background:var(--bg-card);padding:10px;border-radius:var(--radius-sm)"><div style="font-size:11px;color:var(--text-3);margin-bottom:3px">PROYECTO</div><div style="font-size:13px;color:${proj.color}">${proj.icon} ${esc(proj.name)}</div></div>`:''}
+        ${proj?`<div style="background:var(--bg-card);padding:10px;border-radius:var(--radius-sm)"><div style="font-size:11px;color:var(--text-3);margin-bottom:3px">PROYECTO</div><div style="font-size:13px;color:${proj.color};display:flex;align-items:center;gap:5px">${projIconHTML(proj.icon)} ${esc(proj.name)}</div></div>`:''}
         ${sec?`<div style="background:var(--bg-card);padding:10px;border-radius:var(--radius-sm)"><div style="font-size:11px;color:var(--text-3);margin-bottom:3px">SECCIÓN</div><div style="font-size:13px">${esc(sec.name)}</div></div>`:''}
         <div style="background:var(--bg-card);padding:10px;border-radius:var(--radius-sm)"><div style="font-size:11px;color:var(--text-3);margin-bottom:3px">FECHA LÍMITE</div><div style="font-size:13px;color:${isDue&&!t.done?'var(--danger)':'var(--text-1)'}">${t.due?formatDateTime(new Date(t.due)):'Sin fecha'}</div></div>
       </div>
@@ -2480,17 +2495,17 @@ function saveProject() {
   const name=document.getElementById('pf-name').value.trim();
   if(!name){showToast('⚠ Nombre requerido');return;}
   if(editingProjId){
-    projects=projects.map(p=>p.id===editingProjId?{...p,name,icon:p.icon||'📋',color:selectedColor}:p);
+    projects=projects.map(p=>p.id===editingProjId?{...p,name,icon:p.icon||'folder',color:selectedColor}:p);
     showToast('✏ Proyecto actualizado');
     // Update project detail header if open
     if(currentProjectId===editingProjId){
-      const icon = projects.find(p=>p.id===editingProjId)?.icon||'📁';
-      document.getElementById('pd-title').textContent=icon+' '+name;
+      const icon = projects.find(p=>p.id===editingProjId)?.icon||'folder';
+      document.getElementById('pd-title').innerHTML=projIconHTML(icon)+' '+esc(name);
       document.getElementById('pd-progress-fill').style.background=selectedColor;
     }
     save(); closeSheet('proj-overlay'); render();
   } else {
-    const newProj = {id:'p'+Date.now(),name,icon:'📁',color:selectedColor,created:Date.now()};
+    const newProj = {id:'p'+Date.now(),name,icon:'folder',color:selectedColor,created:Date.now()};
     projects.push(newProj);
     save(); closeSheet('proj-overlay'); render();
     showToast('📁 Proyecto creado');
@@ -2643,7 +2658,7 @@ function deleteProject() {
 function populateProjectSelect(selId) {
   document.getElementById('f-project').innerHTML=
     `<option value="">Sin proyecto</option>`+
-    projects.map(p=>`<option value="${p.id}" ${p.id===selId?'selected':''}>${p.icon} ${esc(p.name)}</option>`).join('');
+    projects.map(p=>`<option value="${p.id}" ${p.id===selId?'selected':''}>${esc(p.name)}</option>`).join('');
 }
 
 function populateSectionSelect(projId, selId) {
