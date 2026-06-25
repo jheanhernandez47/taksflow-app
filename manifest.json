@@ -1,11 +1,12 @@
 {
   "name": "TaskFlow",
   "short_name": "TaskFlow",
-  "description": "Gestión de tareas y proyectos offline",
-  "start_url": "/",
+  "description": "Gesti\u00f3n de tareas y proyectos offline",
+  "start_url": "./",
+  "scope": "./",
   "display": "standalone",
-  "background_color": "#0f1117",
-  "theme_color": "#0f1117",
+  "background_color": "#0a0f1e",
+  "theme_color": "#0a0f1e",
   "orientation": "portrait",
   "icons": [
     {
@@ -21,6 +22,9 @@
       "purpose": "any maskable"
     }
   ],
-  "categories": ["productivity", "utilities"],
+  "categories": [
+    "productivity",
+    "utilities"
+  ],
   "lang": "es"
 }
