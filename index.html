@@ -82,7 +82,7 @@ body{background:var(--bg-base);color:var(--text-1);font-family:-apple-system,Bli
 .bnav-item.active{color:var(--accent)}
 
 /* CONTENT */
-.content{flex:1;overflow-y:auto;overscroll-behavior:none;padding:14px 14px 96px;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+.content{flex:1;overflow-y:auto;overscroll-behavior:none;-webkit-overflow-scrolling:touch;padding:14px 14px 96px;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
 .content::-webkit-scrollbar{width:4px}
 .content::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
 
@@ -158,16 +158,16 @@ body{background:var(--bg-base);color:var(--text-1);font-family:-apple-system,Bli
 .proj-list-count{font-size:12px;color:var(--text-3)}
 
 /* ── PROJECT DETAIL VIEW ── */
-#proj-detail-page{position:fixed;inset:0;background:var(--bg-base);z-index:150;transform:translateX(100%);transition:transform .25s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column}
-#summary-page{position:fixed;inset:0;background:var(--bg-base);z-index:150;transform:translateX(100%);transition:transform .25s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column}
+#proj-detail-page{touch-action:pan-y;position:fixed;inset:0;background:var(--bg-base);z-index:150;transform:translateX(100%);transition:transform .25s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column}
+#summary-page{touch-action:pan-y;position:fixed;inset:0;background:var(--bg-base);z-index:150;transform:translateX(100%);transition:transform .25s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column}
 #summary-page.open{transform:translateX(0)}
-#profile-page{position:fixed;inset:0;background:var(--bg-base);z-index:150;transform:translateX(100%);transition:transform .25s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column}
+#profile-page{touch-action:pan-y;position:fixed;inset:0;background:var(--bg-base);z-index:150;transform:translateX(100%);transition:transform .25s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;align-items:stretch}
 
 /* FOCUS / POMODORO SCREEN */
 #pomodoro-page{position:fixed;inset:0;background:radial-gradient(circle at 50% 0%,#0d1e3a 0%,var(--bg-base) 60%);z-index:170;display:flex;flex-direction:column;transform:translateY(100%);transition:transform .3s cubic-bezier(.4,0,.2,1)}
 
 /* PROJECT SUGGESTER */
-#suggester-page{position:fixed;inset:0;background:var(--bg-base);z-index:160;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .25s cubic-bezier(.4,0,.2,1)}
+#suggester-page{touch-action:pan-y;position:fixed;inset:0;background:var(--bg-base);z-index:160;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .25s cubic-bezier(.4,0,.2,1)}
 #suggester-page.open{transform:translateX(0)}
 .suggester-hero{padding:18px 18px 6px;text-align:center;flex-shrink:0}
 .suggester-hero-icon{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#2060a0,#40c0c0);display:flex;align-items:center;justify-content:center;color:#fff;margin:0 auto 12px}
@@ -225,7 +225,7 @@ body{background:var(--bg-base);color:var(--text-1);font-family:-apple-system,Bli
 .focus-cta-btn:active{background:var(--accent);color:#fff;transform:scale(.98)}
 .focus-cta-mins{font-weight:400;opacity:.8;font-size:12px}
 #profile-page.open{transform:translateX(0)}
-#search-page{position:fixed;inset:0;background:var(--bg-base);z-index:150;transform:translateX(100%);transition:transform .25s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column}
+#search-page{touch-action:pan-y;position:fixed;inset:0;background:var(--bg-base);z-index:150;transform:translateX(100%);transition:transform .25s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column}
 #search-page.open{transform:translateX(0)}
 .search-bar-standalone{display:flex;align-items:center;gap:8px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:0 12px;height:42px}
 .search-bar-standalone input{flex:1;background:none;border:none;outline:none;color:var(--text-1);font-size:14px;min-width:0}
@@ -322,7 +322,7 @@ body{background:var(--bg-base);color:var(--text-1);font-family:-apple-system,Bli
 .proj-view-tab{padding:10px 14px;font-size:13px;color:var(--text-2);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap;display:inline-flex;align-items:center;gap:6px}
 .proj-view-tab.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:600}
 
-.proj-detail-content{flex:1;overflow-y:auto;overscroll-behavior:none;padding:12px 14px 80px;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+.proj-detail-content{flex:1;overflow-y:auto;overscroll-behavior:none;-webkit-overflow-scrolling:touch;padding:12px 14px 80px;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
 .proj-detail-content::-webkit-scrollbar{width:4px}
 .proj-detail-content::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
 
@@ -339,7 +339,7 @@ body{background:var(--bg-base);color:var(--text-1);font-family:-apple-system,Bli
 .ov-lbl{font-size:11px;color:var(--text-2);margin-top:4px}
 
 /* Board columns (Tablero view) */
-.board-cols{display:flex;gap:10px;overflow-x:auto;padding-bottom:8px;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+.board-cols{display:flex;gap:10px;overflow-x:auto;overscroll-behavior:none;-webkit-overflow-scrolling:touch;padding-bottom:8px;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
 .board-cols::-webkit-scrollbar{height:4px}
 .board-cols::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
 .board-col{min-width:240px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:12px;flex-shrink:0;transition:background .15s,border-color .15s}
@@ -395,7 +395,7 @@ body{background:var(--bg-base);color:var(--text-1);font-family:-apple-system,Bli
 .color-opt{width:28px;height:28px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:.15s}
 
 /* DETAIL PAGE */
-#detail-page{position:fixed;inset:0;background:var(--bg-base);z-index:160;transform:translateX(100%);transition:transform .25s cubic-bezier(.4,0,.2,1);overflow-y:auto}
+#detail-page{touch-action:pan-y;position:fixed;inset:0;background:var(--bg-base);z-index:160;transform:translateX(100%);transition:transform .25s cubic-bezier(.4,0,.2,1);overflow-y:auto}
 #detail-page.open{transform:translateX(0)}
 .detail-header{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;background:var(--bg-surface)}
 .detail-content{padding:18px}
@@ -1955,7 +1955,7 @@ function renderHome() {
     : `<div class="empty" style="padding:16px 0"><div class="empty-msg">Sin tareas próximas a vencer</div></div>`;
 
   // 2. Proyectos vistos recientemente
-  const recentProjs = getRecentProjects(6);
+  const recentProjs = getRecentProjects(2);
   const recentProjsEl = document.getElementById('home-recent-projects');
   if (!recentProjs.length) {
     recentProjsEl.innerHTML = `<div class="empty" style="padding:16px 0"><div class="empty-msg">Aún no has abierto ningún proyecto</div></div>`;
@@ -1972,7 +1972,7 @@ function renderHome() {
   }
 
   // 3. Tareas añadidas recientemente
-  const recentTasks = [...tasks].sort((a,b)=>b.created-a.created).slice(0, 6);
+  const recentTasks = [...tasks].sort((a,b)=>b.created-a.created).slice(0, 3);
   document.getElementById('home-recent-tasks').innerHTML = recentTasks.length
     ? recentTasks.map(t=>taskCardHTML(t)).join('')
     : `<div class="empty" style="padding:16px 0"><div class="empty-msg">Aún no has creado tareas</div></div>`;
@@ -2819,6 +2819,68 @@ function formatDateTime(d){return d.toLocaleDateString('es',{weekday:'long',day:
    SERVICE WORKER
 ═══════════════════════════════════════ */
 if('serviceWorker'in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{});}
+
+
+/* ═══════════════════════════════════════
+   ANDROID BACK BUTTON HANDLING
+   First press → go to Home tab
+   Second press (already on Home, all
+   overlays closed) → exit the app
+═══════════════════════════════════════ */
+function handleBackButton() {
+  // If any overlay is open, close it first
+  const overlays = [
+    { id: 'detail-page',     close: () => { document.getElementById('detail-page').classList.remove('open'); if(document.getElementById('proj-detail-page').classList.contains('open')) renderProjectView(currentProjView); else render(); } },
+    { id: 'pomodoro-page',   close: () => exitFocus() },
+    { id: 'suggester-page',  close: () => closeSuggester(false) },
+    { id: 'proj-detail-page',close: () => closeProjectDetail() },
+    { id: 'profile-page',    close: () => closeProfile() },
+    { id: 'search-page',     close: () => closeSearchPanel() },
+    { id: 'summary-page',    close: () => closeSummary() },
+  ];
+
+  for (const overlay of overlays) {
+    const el = document.getElementById(overlay.id);
+    if (el && el.classList.contains('open')) {
+      overlay.close();
+      // Push a new history state so the next back press still comes here
+      history.pushState({ taskflow: true }, '');
+      return;
+    }
+  }
+
+  // If FAB menu is open, close it
+  if (document.getElementById('main-fab-menu').classList.contains('open')) {
+    closeFabMenus();
+    history.pushState({ taskflow: true }, '');
+    return;
+  }
+
+  // If not on home tab, go home
+  if (currentTab !== 'home') {
+    switchTab('home');
+    history.pushState({ taskflow: true }, '');
+    return;
+  }
+
+  // Already on home with nothing open → let the app close naturally
+  // (do not call history.pushState — the browser/WebView will handle exit)
+}
+
+// Push an initial state so popstate fires on first back press
+history.pushState({ taskflow: true }, '');
+
+window.addEventListener('popstate', (e) => {
+  handleBackButton();
+  // Always push a new state after handling so we stay in the app
+  // (except when on home with nothing open — handled inside handleBackButton)
+  if (currentTab !== 'home' ||
+      document.querySelectorAll('.open[id$="-page"]').length > 0 ||
+      document.getElementById('main-fab-menu').classList.contains('open')) {
+    history.pushState({ taskflow: true }, '');
+  }
+});
+
 
 init();
 </script>
