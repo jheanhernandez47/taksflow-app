@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#0f1117">
+<meta name="theme-color" content="#0a0f1e">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="description" content="Gestiona tus tareas y proyectos">
@@ -14,28 +14,46 @@
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js" defer></script>
 <style>
 :root {
-  --bg-base:    #0f1117;
-  --bg-surface: #181b23;
-  --bg-card:    #1e2130;
-  --bg-input:   #252840;
-  --bg-hover:   #2a2d45;
-  --accent:     #6c63ff;
-  --accent-dim: #3d3a7c44;
-  --text-1:     #eef0f8;
-  --text-2:     #9a9db8;
-  --text-3:     #5a5d7a;
-  --border:     #2a2d45;
-  --border-2:   #3a3d5c;
+  /* Backgrounds — shifted from neutral-dark to deep navy, matching logo background */
+  --bg-base:    #0a0f1e;
+  --bg-surface: #0f1628;
+  --bg-card:    #141d33;
+  --bg-input:   #1a2540;
+  --bg-hover:   #1f2d4d;
+
+  /* Accent — primary blue from the logo flow, teal as secondary highlight */
+  --accent:     #2080c0;
+  --accent-dim: #2080c022;
+  --accent-glow:#2080c044;
+  --accent2:    #40c0c0;   /* teal — used for gradients and ring progress */
+
+  /* Text — slightly warmer white to contrast the cool blues */
+  --text-1:     #e8f0ff;
+  --text-2:     #7e9cbf;
+  --text-3:     #3d5070;
+
+  /* Borders — navy-tinted instead of purple-tinted */
+  --border:     #1a2a42;
+  --border-2:   #243650;
+
+  /* Semantic colors — kept readable, slightly adjusted for the cooler palette */
   --danger:     #ff5f6d;
   --danger-dim: #4a1a2044;
   --warn:       #ffb344;
   --warn-dim:   #3d2c0a44;
-  --success:    #43e97b;
+  --success:    #2dd4bf;
   --success-dim:#0d332144;
+
+  /* Blue reference (used for project pills etc.) */
+  --blue:       #40c0c0;
+  --pink:       #f472b6;
+  --teal:       #2dd4bf;
+
   --radius-sm:  8px;
   --radius-md:  12px;
   --radius-lg:  18px;
   --radius-xl:  24px;
+}
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;overflow:hidden}
@@ -43,7 +61,7 @@ body{background:var(--bg-base);color:var(--text-1);font-family:-apple-system,Bli
 
 /* HEADER */
 .header{background:var(--bg-surface);border-bottom:1px solid var(--border);padding:14px 16px 10px;display:flex;align-items:center;gap:12px;flex-shrink:0;z-index:10}
-.header-logo{width:32px;height:32px;background:var(--accent);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.header-logo{width:32px;height:32px;background:linear-gradient(135deg,#2060a0,#40c0c0);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
 .header-title{font-size:17px;font-weight:600;letter-spacing:-.3px}
 .header-sub{font-size:12px;color:var(--text-2);margin-top:1px}
 .header-actions{margin-left:auto;display:flex;gap:8px}
@@ -138,13 +156,13 @@ body{background:var(--bg-base);color:var(--text-1);font-family:-apple-system,Bli
 #profile-page{position:fixed;inset:0;background:var(--bg-base);z-index:150;transform:translateX(100%);transition:transform .25s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column}
 
 /* FOCUS / POMODORO SCREEN */
-#pomodoro-page{position:fixed;inset:0;background:radial-gradient(circle at 50% 0%,#1a1d2e 0%,var(--bg-base) 60%);z-index:170;display:flex;flex-direction:column;transform:translateY(100%);transition:transform .3s cubic-bezier(.4,0,.2,1)}
+#pomodoro-page{position:fixed;inset:0;background:radial-gradient(circle at 50% 0%,#0d1e3a 0%,var(--bg-base) 60%);z-index:170;display:flex;flex-direction:column;transform:translateY(100%);transition:transform .3s cubic-bezier(.4,0,.2,1)}
 
 /* PROJECT SUGGESTER */
 #suggester-page{position:fixed;inset:0;background:var(--bg-base);z-index:160;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .25s cubic-bezier(.4,0,.2,1)}
 #suggester-page.open{transform:translateX(0)}
 .suggester-hero{padding:18px 18px 6px;text-align:center;flex-shrink:0}
-.suggester-hero-icon{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#a78bfa);display:flex;align-items:center;justify-content:center;color:#fff;margin:0 auto 12px}
+.suggester-hero-icon{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#2060a0,#40c0c0);display:flex;align-items:center;justify-content:center;color:#fff;margin:0 auto 12px}
 .suggester-hero-title{font-size:17px;font-weight:700;margin-bottom:6px}
 .suggester-hero-sub{font-size:13px;color:var(--text-2);line-height:1.5;max-width:340px;margin:0 auto}
 .suggester-hero-sub strong{color:var(--accent)}
@@ -239,13 +257,13 @@ body{background:var(--bg-base);color:var(--text-1);font-family:-apple-system,Bli
 /* PROFILE HERO */
 .profile-hero{display:flex;flex-direction:column;align-items:center;padding:24px 0 28px;text-align:center}
 .profile-avatar-wrap{position:relative;width:88px;height:88px;cursor:pointer;margin-bottom:14px}
-.profile-avatar{width:88px;height:88px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#a78bfa);display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:700;color:#fff;overflow:hidden;border:2px solid var(--border-2)}
+.profile-avatar{width:88px;height:88px;border-radius:50%;background:linear-gradient(135deg,#2060a0,#40c0c0);display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:700;color:#fff;overflow:hidden;border:2px solid var(--border-2)}
 .profile-avatar img{width:100%;height:100%;object-fit:cover}
 .profile-avatar-edit{position:absolute;bottom:0;right:0;width:28px;height:28px;border-radius:50%;background:var(--accent);border:2px solid var(--bg-base);display:flex;align-items:center;justify-content:center;color:#fff}
-.profile-name-row{width:100%;max-width:280px;display:flex;align-items:center;justify-content:center;gap:6px}
-.profile-name-input{background:none;border:none;outline:none;color:var(--text-1);font-size:19px;font-weight:700;text-align:center;padding:6px;border-bottom:1px solid transparent;transition:border-color .15s;cursor:default;min-width:0;max-width:220px;width:auto}
+.profile-name-row{width:100%;display:flex;align-items:center;justify-content:center;position:relative;padding:0 20px}
+.profile-name-input{background:none;border:none;outline:none;color:var(--text-1);font-size:19px;font-weight:700;text-align:center;padding:6px;border-bottom:1px solid transparent;transition:border-color .15s;cursor:default;width:auto;max-width:calc(100% - 48px);min-width:80px}
 .profile-name-input.editing{border-bottom-color:var(--accent);cursor:text}
-.profile-name-edit-btn{background:var(--bg-card);border:1px solid var(--border);color:var(--text-2);width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:all .15s}
+.profile-name-edit-btn{background:var(--bg-card);border:1px solid var(--border);color:var(--text-2);width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:all .15s;margin-left:6px}
 .profile-name-edit-btn:active{background:var(--bg-hover);transform:scale(.94)}
 .profile-name-edit-btn.editing{background:var(--accent);border-color:var(--accent);color:#fff}
 .profile-name-hint{font-size:11px;color:var(--text-3);margin-top:2px}
