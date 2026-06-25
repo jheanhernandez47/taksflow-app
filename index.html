@@ -113,7 +113,7 @@ body{background:var(--bg-base);color:var(--text-1);font-family:-apple-system,Bli
 .task-check{width:22px;height:22px;flex-shrink:0;border:2px solid var(--border-2);border-radius:50%;display:flex;align-items:center;justify-content:center;margin-top:2px;transition:all .2s;cursor:pointer;background:none;padding:0}
 .task-check.checked{background:var(--accent);border-color:var(--accent)}
 .task-check.checked::after{content:'✓';color:#fff;font-size:12px;font-weight:700}
-.task-body{flex:1;min-width:0;cursor:pointer}
+.task-body{flex:1;min-width:0}
 .task-more-btn{background:none;border:none;color:var(--text-3);font-size:18px;cursor:pointer;padding:2px 8px;flex-shrink:0;border-radius:6px;transition:all .15s;line-height:1;margin-top:-2px}
 .task-more-btn:active{background:var(--bg-hover);color:var(--text-1)}
 .task-title{font-size:14px;font-weight:500;color:var(--text-1);line-height:1.4;word-break:break-word}
@@ -1698,8 +1698,8 @@ function renderProjBoard() {
       ${col.tasks.map(t=>`
         <div class="board-task ${t.done?'done':''}" data-task-id="${t.id}">
           <div style="display:flex;align-items:flex-start;gap:8px">
-            <div role="button" tabindex="0" class="task-check ${t.done?'checked':''}" style="width:18px;height:18px;margin-top:1px" onclick="toggleDone('${t.id}')"></div>
-            <div style="flex:1;cursor:pointer" onclick="openDetail('${t.id}')">
+            <div role="button" tabindex="0" class="task-check ${t.done?'checked':''}" style="width:18px;height:18px;margin-top:1px" data-toggle="${t.id}"></div>
+            <div style="flex:1;cursor:pointer" data-open="${t.id}">
               <div class="board-task-title">${esc(t.title)}</div>
               ${t.due?`<div style="font-size:11px;color:var(--text-3);margin-top:5px;display:flex;align-items:center;gap:4px"><i data-lucide="calendar" class="ico-sm"></i> ${formatDate(new Date(t.due))}</div>`:''}
               ${t.subtasks.length?`<div style="font-size:11px;color:var(--text-3);margin-top:4px">${t.subtasks.filter(s=>s.done).length}/${t.subtasks.length} subtareas</div>`:''}
@@ -1860,9 +1860,9 @@ function taskCardHTML(t) {
   const dueStr = t.due ? formatDate(new Date(t.due)) : '';
   const dc     = t.subtasks.filter(s=>s.done).length;
   const pct    = t.subtasks.length ? Math.round(dc/t.subtasks.length*100) : 0;
-  return `<div class="task-card ${t.done?'done':''}">
-    <div role="button" tabindex="0" class="task-check ${t.done?'checked':''}" onclick="toggleDone('${t.id}')"></div>
-    <div class="task-body" onclick="openDetail('${t.id}')">
+  return `<div class="task-card ${t.done?'done':''}" data-task-id="${t.id}">
+    <div role="button" tabindex="0" class="task-check ${t.done?'checked':''}" data-toggle="${t.id}"></div>
+    <div class="task-body" data-open="${t.id}">
       <div class="task-title ${t.done?'done':''}">${esc(t.title)}</div>
       ${t.desc?`<div class="task-desc">${esc(t.desc)}</div>`:''}
       <div class="task-meta">
@@ -1872,7 +1872,7 @@ function taskCardHTML(t) {
       </div>
       ${t.subtasks.length?`<div class="subtask-bar"><div class="subtask-fill" style="width:${pct}%"></div></div>`:''}
     </div>
-    <button type="button" class="task-more-btn" onclick="openDetail('${t.id}')" aria-label="Ver detalles">⋮</button>
+    <button type="button" class="task-more-btn" data-open="${t.id}" aria-label="Ver detalles">⋮</button>
   </div>`;
 }
 
@@ -2822,10 +2822,54 @@ if('serviceWorker'in navigator){navigator.serviceWorker.register('sw.js').catch(
 
 
 /* ═══════════════════════════════════════
-   ANDROID BACK BUTTON HANDLING
-   First press → go to Home tab
+   TAP vs SCROLL DETECTION
+   Uses pointerdown/pointerup to distinguish
+   a real tap (< 8px movement) from a scroll
+   gesture. Replaces direct onclick on task
+   cards so scroll never gets blocked.
+═══════════════════════════════════════ */
+(function() {
+  let startX = 0, startY = 0, didScroll = false;
+  const SCROLL_THRESHOLD = 8; // px
+
+  document.addEventListener('pointerdown', e => {
+    startX = e.clientX;
+    startY = e.clientY;
+    didScroll = false;
+  }, { passive: true });
+
+  document.addEventListener('pointermove', e => {
+    if (Math.abs(e.clientX - startX) > SCROLL_THRESHOLD ||
+        Math.abs(e.clientY - startY) > SCROLL_THRESHOLD) {
+      didScroll = true;
+    }
+  }, { passive: true });
+
+  document.addEventListener('pointerup', e => {
+    if (didScroll) return; // was a scroll gesture, not a tap
+
+    const target = e.target;
+
+    // task-check: toggle done
+    const toggleEl = target.closest('[data-toggle]');
+    if (toggleEl) {
+      toggleDone(toggleEl.dataset.toggle);
+      return;
+    }
+
+    // task-body or task-more-btn: open detail
+    const openEl = target.closest('[data-open]');
+    if (openEl) {
+      openDetail(openEl.dataset.open);
+      return;
+    }
+  });
+})();
+
+
+/* First press: go to Home tab
    Second press (already on Home, all
-   overlays closed) → exit the app
+   overlays closed): exit the app
 ═══════════════════════════════════════ */
 function handleBackButton() {
   // If any overlay is open, close it first
@@ -2881,6 +2925,58 @@ window.addEventListener('popstate', (e) => {
   }
 });
 
+
+
+/* ═══════════════════════════════════════
+   SCROLL-SAFE TAP DETECTION
+   Prevents the WebView from blocking
+   scroll when the user touches a task
+   card. We only fire openDetail() if
+   the finger moved less than 8px (a tap),
+   not if it moved more (a scroll).
+═══════════════════════════════════════ */
+(function() {
+  const MOVE_THRESHOLD = 8; // px — more than this = scroll, not tap
+
+  document.addEventListener('touchstart', function(e) {
+    const card = e.target && e.target.closest && e.target.closest('.task-card[data-task-id]');
+    if (!card) return;
+    if (e.target.closest('.task-check')) return;
+    const t = e.touches[0];
+    card._tapStartX = t.clientX;
+    card._tapStartY = t.clientY;
+    card._tapping   = true;
+  }, { passive: true });
+
+  document.addEventListener('touchmove', function(e) {
+    const card = e.target && e.target.closest && e.target.closest('.task-card[data-task-id]');
+    if (!card || !card._tapping) return;
+    const t = e.touches[0];
+    const dx = Math.abs(t.clientX - card._tapStartX);
+    const dy = Math.abs(t.clientY - card._tapStartY);
+    if (dx > MOVE_THRESHOLD || dy > MOVE_THRESHOLD) {
+      card._tapping = false;
+    }
+  }, { passive: true });
+
+  document.addEventListener('touchend', function(e) {
+    const card = e.target && e.target.closest && e.target.closest('.task-card[data-task-id]');
+    if (!card || !card._tapping) return;
+    card._tapping = false;
+    if (e.target.closest('.task-check')) return;
+    const taskId = card.getAttribute('data-task-id');
+    if (taskId) openDetail(taskId);
+  }, { passive: true });
+
+  // Also handle ⋮ button clicks via delegation
+  document.addEventListener('click', function(e) {
+    const btn = e.target.closest('.task-more-btn[data-open]');
+    if (btn) {
+      e.stopPropagation();
+      openDetail(btn.getAttribute('data-open'));
+    }
+  });
+})();
 
 init();
 </script>
