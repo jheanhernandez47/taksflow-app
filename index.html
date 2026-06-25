@@ -241,7 +241,11 @@ body{background:var(--bg-base);color:var(--text-1);font-family:-apple-system,Bli
 .alert-banner.level-overdue{background:#3a0a0e;border:1px solid var(--danger)}
 .alert-banner.level-today{background:#2a1e00;border:1px solid var(--warn)}
 .alert-banner.level-tomorrow{background:#0d2a1a;border:1px solid var(--success)}
-.alert-banner-icon{font-size:22px;flex-shrink:0;margin-top:1px}
+.alert-banner-icon{font-size:22px;flex-shrink:0;margin-top:2px;display:flex;align-items:flex-start}
+.urgency-dot{width:14px;height:14px;border-radius:50%;flex-shrink:0;display:inline-block}
+.dot-red{background:var(--danger)}
+.dot-yellow{background:var(--warn)}
+.dot-green{background:var(--success)}
 .alert-banner-body{flex:1;min-width:0}
 .alert-banner-title{font-size:14px;font-weight:700;margin-bottom:3px}
 .alert-banner.level-overdue .alert-banner-title{color:var(--danger)}
@@ -963,7 +967,7 @@ const COLORS  = ['#6c63ff','#43e97b','#38bdf8','#f472b6','#ffb344','#ff5f6d','#2
 const TIP_DEFINITIONS = {
   home: {
     id: 'home',
-    icon: '🏠',
+    icon: 'home',
     title: '¡Bienvenido a TaskFlow!',
     body: 'Esta es tu pantalla de Inicio. Verás tus tareas más urgentes, los proyectos que abriste recientemente y las tareas que creaste últimamente — todo de un vistazo.',
     anchor: 'tab-home',
@@ -972,7 +976,7 @@ const TIP_DEFINITIONS = {
   },
   tasks: {
     id: 'tasks',
-    icon: '☑️',
+    icon: 'square-check-big',
     title: 'Mis tareas',
     body: 'Aquí están todas tus tareas personales, agrupadas por secciones. Toca el círculo para marcar una como completada, o los tres puntos ⋮ para ver sus detalles.',
     anchor: 'tab-tasks',
@@ -981,7 +985,7 @@ const TIP_DEFINITIONS = {
   },
   projects: {
     id: 'projects',
-    icon: '📁',
+    icon: 'folder',
     title: 'Proyectos',
     body: 'Organiza tu trabajo en proyectos. Cada uno tiene tres vistas: Lista, Tablero (Kanban) y Resumen. Al crear un proyecto, la app te sugerirá tareas típicas según el tipo que sea.',
     anchor: 'tab-projects',
@@ -990,7 +994,7 @@ const TIP_DEFINITIONS = {
   },
   profile: {
     id: 'profile',
-    icon: '👤',
+    icon: 'user',
     title: 'Tu perfil',
     body: 'Aquí puedes poner tu foto y nombre, activar notificaciones de vencimiento, y exportar o importar todos tus datos como respaldo.',
     anchor: 'tab-profile',
@@ -1014,7 +1018,13 @@ function showTip(id) {
   if (!def || !shouldShowTip(id)) return;
 
   // Populate content
-  document.getElementById('tip-icon').textContent  = def.icon;
+  // Render icon: Lucide name → <i data-lucide>, else plain text
+  const tipIconEl = document.getElementById('tip-icon');
+  if (def.icon && /^[a-z0-9-]+$/.test(def.icon)) {
+    tipIconEl.innerHTML = `<i data-lucide="${def.icon}" class="ico-xl" style="color:var(--accent)"></i>`;
+  } else {
+    tipIconEl.textContent = def.icon;
+  }
   document.getElementById('tip-title').textContent = def.title;
   document.getElementById('tip-body').textContent  = def.body;
   document.getElementById('tip-step').textContent  = def.step;
@@ -1375,16 +1385,16 @@ function toggleNameEdit() {
 function handleAvatarUpload(ev) {
   const file = ev.target.files && ev.target.files[0];
   if (!file) return;
-  if (!file.type.startsWith('image/')) { showToast('⚠ Selecciona una imagen válida'); return; }
-  if (file.size > 3 * 1024 * 1024) { showToast('⚠ Imagen muy pesada (máx. 3MB)'); return; }
+  if (!file.type.startsWith('image/')) { showToast('Selecciona una imagen válida'); return; }
+  if (file.size > 3 * 1024 * 1024) { showToast('Imagen muy pesada (máx. 3 MB)'); return; }
   const reader = new FileReader();
   reader.onload = () => {
     profile.avatarDataUrl = reader.result;
     saveProfile();
     renderProfileHero();
-    showToast('📷 Foto actualizada');
+    showToast('Foto actualizada');
   };
-  reader.onerror = () => showToast('⚠ No se pudo leer la imagen');
+  reader.onerror = () => showToast('No se pudo leer la imagen');
   reader.readAsDataURL(file);
 }
 
@@ -1416,22 +1426,22 @@ function updateNotifStatusSub() {
 async function onNotifToggle(checkbox) {
   if (checkbox.checked) {
     if (!('Notification' in window)) {
-      showToast('⚠ No disponible en este navegador');
+      showToast('No disponible en este navegador');
       checkbox.checked = false;
       return;
     }
     const perm = await Notification.requestPermission();
     if (perm === 'granted') {
-      showToast('🔔 Notificaciones activadas');
+      showToast('Notificaciones activadas');
       scheduleNotifications();
     } else {
-      showToast('🔕 Permiso denegado');
+      showToast('Permiso denegado');
       checkbox.checked = false;
     }
   } else {
     // Browsers don't allow revoking permission programmatically;
     // we simply stop scheduling new notifications.
-    showToast('🔕 No se programarán nuevos avisos');
+    showToast('No se programarán nuevos avisos');
   }
   updateNotifStatusSub();
 }
@@ -1453,7 +1463,7 @@ function exportData() {
   a.click();
   a.remove();
   URL.revokeObjectURL(url);
-  showToast('⬇ Datos exportados');
+  showToast('Datos exportados');
 }
 
 function handleImportFile(ev) {
@@ -1464,7 +1474,7 @@ function handleImportFile(ev) {
     try {
       const data = JSON.parse(reader.result);
       if (!data || !Array.isArray(data.tasks) || !Array.isArray(data.projects)) {
-        showToast('⚠ Archivo inválido');
+        showToast('Archivo inválido');
         return;
       }
       tasks    = data.tasks;
@@ -1476,13 +1486,13 @@ function handleImportFile(ev) {
         saveProfile();
         renderProfileHero();
       }
-      showToast('⬆ Datos importados correctamente');
+      showToast('Datos importados correctamente');
       render();
     } catch (e) {
-      showToast('⚠ No se pudo leer el archivo');
+      showToast('No se pudo leer el archivo');
     }
   };
-  reader.onerror = () => showToast('⚠ No se pudo leer el archivo');
+  reader.onerror = () => showToast('No se pudo leer el archivo');
   reader.readAsText(file);
   ev.target.value = '';
 }
@@ -1571,7 +1581,7 @@ function projIconHTML(icon) {
     return `<i data-lucide="${icon}" class="proj-lucide-icon"></i>`;
   }
   // Fallback: render as emoji/text
-  return `<span>${icon||'📁'}</span>`;
+  return `<i data-lucide=folder class="proj-lucide-icon"></i>`;
 }
 
 function renderProjects() {
@@ -1791,7 +1801,7 @@ function moveTaskToSection(taskId, newSectionId) {
   if (!t || t.sectionId === newSectionId) return;
   tasks = tasks.map(x => x.id===taskId ? {...x, sectionId: newSectionId} : x);
   save();
-  showToast('↔ Tarea movida');
+  showToast('Tarea movida');
   if (document.getElementById('proj-detail-page').classList.contains('open')) {
     renderProjectView(currentProjView);
   }
@@ -1887,13 +1897,13 @@ function renderUrgencyBanner() {
 
   if (overdue.length) {
     level = 'overdue';
-    icon = '🔴';
+    icon = '<span class="urgency-dot dot-red"></span>';
     title = `${overdue.length} tarea${overdue.length>1?'s':''} vencida${overdue.length>1?'s':''}`;
     sub = 'Estas tareas ya pasaron su fecha límite';
     taskList = overdue;
   } else if (dueToday.length) {
     level = 'today';
-    icon = '🟡';
+    icon = '<span class="urgency-dot dot-yellow"></span>';
     title = `${dueToday.length} tarea${dueToday.length>1?'s':''} para hoy`;
     sub = dueToday.length === 1
       ? `Vence a las ${formatTime(new Date(dueToday[0].due))}`
@@ -1901,7 +1911,7 @@ function renderUrgencyBanner() {
     taskList = dueToday;
   } else if (dueTomorrow.length) {
     level = 'tomorrow';
-    icon = '🟢';
+    icon = '<span class="urgency-dot dot-green"></span>';
     title = `${dueTomorrow.length} tarea${dueTomorrow.length>1?'s':''} para mañana`;
     sub = 'Recuerda organizarte con tiempo';
     taskList = dueTomorrow;
@@ -1939,7 +1949,7 @@ function renderHome() {
     .slice(0, 6);
   document.getElementById('home-upcoming-list').innerHTML = upcoming.length
     ? upcoming.map(t=>taskCardHTML(t)).join('')
-    : `<div class="empty" style="padding:16px 0"><div class="empty-msg">Sin tareas próximas a vencer 🎉</div></div>`;
+    : `<div class="empty" style="padding:16px 0"><div class="empty-msg">Sin tareas próximas a vencer</div></div>`;
 
   // 2. Proyectos vistos recientemente
   const recentProjs = getRecentProjects(6);
@@ -2147,10 +2157,10 @@ function completePomoPhase() {
     const key = todayKey();
     pomoLog[key] = (pomoLog[key] || 0) + 1;
     savePomoState();
-    showToast('🍅 ¡Ciclo de enfoque completado!');
+    showToast('¡Ciclo de enfoque completado!');
     setPomoPhase('break');
   } else {
-    showToast('☕ Descanso terminado — ¿seguimos?');
+    showToast('Descanso terminado — ¿seguimos?');
     setPomoPhase('work');
   }
   updatePomoStatsDisplay();
@@ -2187,14 +2197,14 @@ function savePomoSettings() {
   const work = parseInt(document.getElementById('pomo-work-input').value, 10);
   const brk  = parseInt(document.getElementById('pomo-break-input').value, 10);
   if (!work || work < 1 || work > 120 || !brk || brk < 1 || brk > 60) {
-    showToast('⚠ Revisa los minutos ingresados');
+    showToast('Revisa los minutos ingresados');
     return;
   }
   pomoSettings = { workMin: work, breakMin: brk };
   savePomoState();
   closePomoSettings();
   resetPomodoro();
-  showToast('⏱ Duración actualizada');
+  showToast('Duración actualizada');
 }
 
 /* ═══════════════════════════════════════
@@ -2394,7 +2404,7 @@ function openEditTask(id) {
 
 function saveTask() {
   const title=document.getElementById('f-title').value.trim();
-  if(!title){showToast('⚠ El título es obligatorio');return;}
+  if(!title){showToast('El título es obligatorio');return;}
   const dueVal=document.getElementById('f-due').value;
   const projId=document.getElementById('f-project').value;
   let secId=document.getElementById('f-section').value;
@@ -2409,8 +2419,8 @@ function saveTask() {
     subtasks:formSubtasks,
     created:editingTaskId?tasks.find(t=>t.id===editingTaskId)?.created||Date.now():Date.now(),
   };
-  if(editingTaskId){tasks=tasks.map(t=>t.id===editingTaskId?task:t);showToast('✏ Tarea actualizada');}
-  else{tasks.unshift(task);showToast('✅ Tarea creada');}
+  if(editingTaskId){tasks=tasks.map(t=>t.id===editingTaskId?task:t);showToast('Tarea actualizada');}
+  else{tasks.unshift(task);showToast('Tarea creada');}
   save(); closeSheet('task-overlay');
   if(currentProjectId) renderProjectView(currentProjView); else render();
   scheduleNotifications();
@@ -2420,13 +2430,13 @@ function deleteTask() {
   if(!editingTaskId) return;
   tasks=tasks.filter(t=>t.id!==editingTaskId); save(); closeSheet('task-overlay');
   if(currentProjectId) renderProjectView(currentProjView); else render();
-  showToast('🗑 Tarea eliminada');
+  showToast('Tarea eliminada');
 }
 
 function toggleDone(id) {
   tasks=tasks.map(t=>t.id===id?{...t,done:!t.done}:t); save();
   const t=tasks.find(x=>x.id===id);
-  if(t?.done) showToast('✅ ¡Completada!');
+  if(t?.done) showToast('¡Completada!');
   if(document.getElementById('proj-detail-page').classList.contains('open')) renderProjectView(currentProjView);
   else render();
 }
@@ -2450,11 +2460,11 @@ function openNewSectionSheet(projId) {
 
 function saveSection() {
   const name=document.getElementById('sf-name').value.trim();
-  if(!name){showToast('⚠ Nombre requerido');return;}
+  if(!name){showToast('Nombre requerido');return;}
   const projSections=sections.filter(s=>s.projectId===sectionTargetProjId);
   sections.push({id:'sec_'+Date.now(),name,projectId:sectionTargetProjId,order:projSections.length});
   save(); closeSheet('section-overlay');
-  showToast('📂 Sección creada');
+  showToast('Sección creada');
   if(currentProjectId) renderProjectView(currentProjView); else render();
 }
 
@@ -2463,7 +2473,7 @@ function deleteSectionConfirm(secId) {
   // Move tasks to default
   tasks=tasks.map(t=>t.sectionId===secId?{...t,sectionId:MY_TASKS_DEFAULT_SECTION}:t);
   sections=sections.filter(s=>s.id!==secId);
-  save(); showToast('🗑 Sección eliminada');
+  save(); showToast('Sección eliminada');
   if(currentProjectId) renderProjectView(currentProjView); else render();
 }
 
@@ -2493,10 +2503,10 @@ function openEditProject(id) {
 
 function saveProject() {
   const name=document.getElementById('pf-name').value.trim();
-  if(!name){showToast('⚠ Nombre requerido');return;}
+  if(!name){showToast('Nombre requerido');return;}
   if(editingProjId){
     projects=projects.map(p=>p.id===editingProjId?{...p,name,icon:p.icon||'folder',color:selectedColor}:p);
-    showToast('✏ Proyecto actualizado');
+    showToast('Proyecto actualizado');
     // Update project detail header if open
     if(currentProjectId===editingProjId){
       const icon = projects.find(p=>p.id===editingProjId)?.icon||'folder';
@@ -2508,7 +2518,7 @@ function saveProject() {
     const newProj = {id:'p'+Date.now(),name,icon:'folder',color:selectedColor,created:Date.now()};
     projects.push(newProj);
     save(); closeSheet('proj-overlay'); render();
-    showToast('📁 Proyecto creado');
+    showToast('Proyecto creado');
 
     const match = findTemplateMatch(name);
     if (match) {
@@ -2622,7 +2632,7 @@ function confirmSuggestions() {
 
   save();
   closeSuggester(true);
-  showToast(addedCount ? `✨ ${addedCount} tarea${addedCount===1?'':'s'} agregada${addedCount===1?'':'s'}` : 'Proyecto creado sin tareas sugeridas');
+  showToast(addedCount ? `${addedCount} tarea${addedCount===1?'':'s'} agregada${addedCount===1?'':'s'}` : 'Proyecto creado sin tareas sugeridas');
   render();
 }
 
@@ -2649,7 +2659,7 @@ function deleteProject() {
   delete recentProjectViews[editingProjId];
   localStorage.setItem('tf2_recent_projects', JSON.stringify(recentProjectViews));
   save(); closeSheet('proj-overlay'); closeProjectDetail();
-  showToast('🗑 Proyecto eliminado');
+  showToast('Proyecto eliminado');
 }
 
 /* ═══════════════════════════════════════
@@ -2721,7 +2731,7 @@ function scheduleNotifications(){
       // Already overdue — fire an immediate notification (once per session)
       if (!t._notifiedOverdue) {
         const timer = setTimeout(() => {
-          new Notification('🔴 Tarea vencida', {
+          new Notification('Tarea vencida', {
             body: t.title + '\nVenció: ' + formatDateTime(due),
             icon: 'icon-192.png',
             tag: 'overdue_' + t.id,
@@ -2739,7 +2749,7 @@ function scheduleNotifications(){
 
     if (diff > 60 * 60 * 1000) {
       // Notify 1 hour before
-      schedule.push({ fireAt: diff - 60*60*1000, label: 'Vence en 1 hora' });
+      schedule.push({ fireAt: diff - 60*60*1000, label: 'Vence en 1 hora ' });
     }
     if (diff > 15 * 60 * 1000) {
       // Notify 15 minutes before
@@ -2752,7 +2762,7 @@ function scheduleNotifications(){
 
     schedule.forEach(({ fireAt, label }) => {
       const timer = setTimeout(() => {
-        new Notification('⏰ ' + label, {
+        new Notification(label, {
           body: t.title,
           icon: 'icon-192.png',
           tag: t.id + '_' + label,
